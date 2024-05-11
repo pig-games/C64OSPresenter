@@ -35,7 +35,7 @@ sl{CBM-@}curr  .byte 0
 sl{CBM-@}lopg  .byte 0
 sl{CBM-@}hipg  .byte 0
 
-sl{CBM-@}row   .word 0
+sl{CBM-@}row   .byte 0
 sl{CBM-@}seglo .byte 0
 sl{CBM-@}seghi .byte 0
 

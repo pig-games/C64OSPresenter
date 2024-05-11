@@ -44,14 +44,11 @@ pr{CBM-@}init  ;Initialise presentation
 
          ldx #0
          ldy pr{CBM-@}bufpg
-         stx sl{CBM-@}lopg
          stx sl{CBM-@}seglo
-         sty sl{CBM-@}hipg
          sty sl{CBM-@}seghi
 
          stx sl{CBM-@}curr
          stx sl{CBM-@}row
-         stx sl{CBM-@}row+1
          stx pr{CBM-@}state
          stx ystore
 
@@ -118,9 +115,8 @@ pr{CBM-@}clr
 
          ldx #0
          stx sl{CBM-@}row
-         stx sl{CBM-@}row+1
 
-         #rdxy sl{CBM-@}row
+         #ldxy 0
          clc
          jsr setlrc
          #ldxy 0
@@ -148,6 +144,9 @@ pr{CBM-@}render ;render a segment of content
 
 loop     lda (ptr),y
          beq end
+
+         cpy #0
+         bne tst{CBM-@}cr
 
          cmp #c{CBM-@}newsl
          bne tst{CBM-@}cr
@@ -201,6 +200,9 @@ notpause
          beq end
 
 printchr
+         cmp #$a0
+         bne *+4
+         lda #$20
          jsr ctxdraw
 
 next     iny

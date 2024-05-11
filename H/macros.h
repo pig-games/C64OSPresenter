@@ -1,4 +1,4 @@
-;----[macros.h - presenter ]-----------
+;----[/h/:macros.h - presenter ]--------
 
 regstore = $c8   ;A/X/Y +0+1+2
 
@@ -49,9 +49,10 @@ pr{CBM-@}cl{CBM-@}dirty .macro
          .endm
 
 ui{CBM-@}newline .macro
-         #inc16 sl{CBM-@}row
+         inc sl{CBM-@}row
 
-         #rdxy sl{CBM-@}row
+         ldx sl{CBM-@}row
+         ldy #0
          clc
          jsr setlrc
          #ldxy 0
