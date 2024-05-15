@@ -133,7 +133,7 @@ extloop
          cmp fileext,x
          bne invalidt
          dex
-         bne extloop
+         bpl extloop
 
          ldx #20     ;fdtype
 dentr    lda $ffff,x ; self mod
