@@ -1,12 +1,13 @@
-!
+!S
 
-test presentation
-* bullet1
-* bullet2
-!slide2
+!C00t!C03e!C04s!C05t !C14presentation
+!C03* bullet1
+!C07* bullet2
+!Sslide2
 bla bla
-,after pause
-* another bullet
-,* and another
-.
+!P!L1010after pause
+* another !Pbullet
+!P* and another
+!L0001after locate
+!E
 

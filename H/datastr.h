@@ -30,6 +30,7 @@ openfrpg .byte 0
 pr{CBM-@}bufpg .byte 0
 pr{CBM-@}bufsz .byte 0 ;size in pages
 pr{CBM-@}state .byte 0
+pr{CBM-@}command .byte 0
 
 sl{CBM-@}curr  .byte 0
 sl{CBM-@}lopg  .byte 0

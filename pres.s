@@ -6,9 +6,13 @@
 strcolor .byte clblue
 
 cr       = $0d ;Cariage return
-c{CBM-@}newsl  = "!" ;New Slide
-c{CBM-@}pause  = "," ;Pause output
-c{CBM-@}end    = "." ;End marker
+c{CBM-@}cmd    = "!" ;Command
+c{CBM-@}slide  = "S" ;Slide start
+c{CBM-@}pause  = "P" ;Pause output
+c{CBM-@}loc    = "L" ;Change location
+c{CBM-@}color  = "C" ;Set color
+c{CBM-@}backgr = "B" ;Set background color
+c{CBM-@}end    = "E" ;End
 
 s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
@@ -109,7 +113,54 @@ done     clc
          rts
          .bend
 
-pr{CBM-@}clr
+getnum   ;get 2 decimal number
+         .block
+         lda (ptr),y
+         sec
+         sbc #48
+         sta ystore
+         asl a
+         asl a
+         clc
+         adc ystore
+         asl a
+         sta ystore
+         iny
+         bne *+4
+         inc ptr+1
+         lda (ptr),y
+         sec
+         sbc #48
+         clc
+         adc ystore
+         iny
+         bne *+4
+         inc ptr+1
+         rts
+         .bend
+
+pr{CBM-@}docmd
+         .block
+         iny
+         bne *+4
+         inc ptr+1
+
+         #switch 4
+         .byte c{CBM-@}slide
+         .byte c{CBM-@}loc
+         .byte c{CBM-@}color
+         .byte c{CBM-@}backgr
+         .rta pr{CBM-@}doslide
+         .rta pr{CBM-@}doloc
+         .rta pr{CBM-@}docolor
+         .rta pr{CBM-@}dobackgr
+
+         sec
+         rts
+         .bend
+
+pr{CBM-@}doslide
+pr{CBM-@}dobackgr
          .block
          sty ystore
 
@@ -129,6 +180,49 @@ pr{CBM-@}clr
 
          ldy ystore
 
+         clc
+         rts
+         .bend
+
+pr{CBM-@}docolor
+         .block
+
+         jsr getnum
+         sty ystore
+         ;Set Draws Properties and Color
+         ldx #d{CBM-@}crsr{CBM-@}h.d{CBM-@}petscr
+         tay
+         jsr setdprops
+
+         ldy ystore
+
+         clc
+         rts
+         .bend
+
+pr{CBM-@}doloc
+         .block
+         ; get column
+         jsr getnum
+         pha ;save column
+
+         ; get row
+         jsr getnum
+         sty ystore
+         sta sl{CBM-@}row
+         tax
+         ldy #0
+         clc
+         jsr setlrc
+
+         pla ;restore column
+         tax
+         ldy #0
+         sec
+         jsr setlrc
+         ldy ystore
+
+         clc
          rts
          .bend
 
@@ -142,27 +236,49 @@ pr{CBM-@}render ;render a segment of content
 
          ldy #0
 
+         lda pr{CBM-@}command
+         beq loop
+
+         sty pr{CBM-@}command
+         jsr pr{CBM-@}docmd
+         bcs end
+
 loop     lda (ptr),y
          beq end
 
-         cpy #0
-         bne tst{CBM-@}cr
-
-         cmp #c{CBM-@}newsl
-         bne tst{CBM-@}cr
-         ;process newslide
-         jsr pr{CBM-@}clr
-
-         jmp next
-tst{CBM-@}cr
          cmp #cr
-         bne printchr
-docr
+         bne nocr
+
          sty ystore
          #ui{CBM-@}newline
          ldy ystore
+         jmp next
+nocr
+         cmp #c{CBM-@}cmd
+         beq docmd
 
-         ; now check for command code
+printchr
+         cmp #$a0
+         bne *+4
+         lda #$20
+         jsr ctxdraw
+
+next     iny
+         bne loop
+         inc ptr+1
+         bne loop
+
+end
+         ldx #0
+         ldy pr{CBM-@}bufpg
+         #stxy sl{CBM-@}seglo
+
+         lda #s{CBM-@}ended
+         sta pr{CBM-@}state
+         rts
+
+docmd
+         ; get command code
          iny
          bne *+4
          inc ptr+1
@@ -170,18 +286,20 @@ docr
          lda (ptr),y
          beq end
 
-         cmp #cr ;if another cr go again
-         beq docr
+         cmp #"!"
+         beq printchr
 
-         cmp #c{CBM-@}newsl ;test for newslide
-         beq pause ;only need pause
+         cmp #c{CBM-@}slide
+         bne noslide
 
-notnewsl
+         sta pr{CBM-@}command
+         beq pause
+noslide
          cmp #c{CBM-@}pause
-         bne notpause
+         bne nopause
 
          iny
-         bne pause
+         bne *+4
          inc ptr+1
 pause
          clc
@@ -194,30 +312,13 @@ pause
 
          lda #s{CBM-@}paused
          sta pr{CBM-@}state
+
          rts
-notpause
-         cmp #c{CBM-@}end
-         beq end
+nopause
+         jsr pr{CBM-@}docmd
+         bcs end
+         jmp loop
 
-printchr
-         cmp #$a0
-         bne *+4
-         lda #$20
-         jsr ctxdraw
-
-next     iny
-         bne loop
-nextpg   inc ptr+1
-         bne loop
-
-end
-         ldx #0
-         ldy pr{CBM-@}bufpg
-         #stxy sl{CBM-@}seglo
-
-         lda #s{CBM-@}ended
-         sta pr{CBM-@}state
-         rts
          .bend
 
 pr{CBM-@}start
