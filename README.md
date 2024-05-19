@@ -21,5 +21,5 @@ The following commands are supported:
   *  __!SL'\<path\>'__: Loads a SID file. Note that the path needs to be enclosed by single quotes.
   *  __!SS__: Returns the 'play head' to the start of the SID file.
   *  __!SP__: Toggles pause/play on the currently loaded SID file.
-* __E__: Ends the presentation.
+* __!E__: Ends the presentation.
 
