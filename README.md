@@ -8,7 +8,7 @@ The file format is a very simple petscii format that can be created and edited w
 # File format
 Presentation files are sequence files that are required to have the '.prs' file extension.
 
-The bulk of a presentation file consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!'.
+The bulk of a presentation file consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
 
 The following commands are supported:
 * __!S__: Start of a new slide. This command pauses the presentation and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen.
