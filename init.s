@@ -21,12 +21,12 @@ init
          lda #mapapp
          ldx #1
          jsr pgalloc
-         sty sl{CBM-@}lopg
+         sty pr{CBM-@}fbfpg
 
          lda #mapapp
          ldx #1
          jsr pgalloc
-         sty sl{CBM-@}hipg
+         sty sl{CBM-@}ptrpg
 
          ;Load Shared Libraries
 

@@ -19,10 +19,10 @@ willquit
 
          ;free slide location buffers
          ldx #1
-         ldy sl{CBM-@}lopg
+         ldy pr{CBM-@}fbfpg
          jsr pgfree
          ldx #1
-         ldy sl{CBM-@}hipg
+         ldy sl{CBM-@}ptrpg
          jsr pgfree
 
          ;free presentation mem
@@ -161,7 +161,7 @@ drawmain ;Main draw routine
 
          ;Set Draws Properties and Color
          ldx #d{CBM-@}crsr{CBM-@}h.d{CBM-@}petscr
-         ldy strcolor
+         ldy defcolor
          jsr setdprops
 
          lda pr{CBM-@}bufsz

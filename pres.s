@@ -1,18 +1,22 @@
 ;- pres.s ------------------------------
 
-
 ; Constants
 
-strcolor .byte clblue
+defcolor .byte cblack
+defbcolor .byte cwhite
 
 cr       = $0d ;Cariage return
 c{CBM-@}cmd    = "!" ;Command
-c{CBM-@}slide  = "S" ;Slide start
-c{CBM-@}pause  = "P" ;Pause output
-c{CBM-@}loc    = "L" ;Change location
-c{CBM-@}color  = "C" ;Set color
-c{CBM-@}backgr = "B" ;Set background color
-c{CBM-@}end    = "E" ;End
+c{CBM-@}slide  = "s" ;Slide start
+c{CBM-@}prevsl = "S" ;Prev slide
+c{CBM-@}pause  = "p" ;Pause output
+c{CBM-@}dfield = "d" ;Define field
+c{CBM-@}field  = "f" ;Insert field value
+c{CBM-@}loc    = "l" ;Change location
+c{CBM-@}home   = "h" ;Change home
+c{CBM-@}color  = "c" ;Set color
+c{CBM-@}backgr = "b" ;Set background color
+c{CBM-@}end    = "e" ;End
 
 s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
@@ -50,11 +54,21 @@ pr{CBM-@}init  ;Initialise presentation
          ldy pr{CBM-@}bufpg
          stx sl{CBM-@}seglo
          sty sl{CBM-@}seghi
-
-         stx sl{CBM-@}curr
          stx sl{CBM-@}row
+         stx sl{CBM-@}col
          stx pr{CBM-@}state
          stx ystore
+         lda #$ff ;no slides yet
+         sta sl{CBM-@}cur
+
+         tya      ; A = pr{CBM-@}bufpg
+         ldy sl{CBM-@}ptrpg
+         #stxy ptr
+         ldy #$80 ;hi pages
+         sta (ptr),y
+         lda #0
+         ldy #0   ;lo pages
+         sta (ptr),y
 
          rts
          .bend
@@ -145,12 +159,14 @@ pr{CBM-@}docmd
          bne *+4
          inc ptr+1
 
-         #switch 4
+         #switch 5
          .byte c{CBM-@}slide
+         .byte c{CBM-@}prevsl
          .byte c{CBM-@}loc
          .byte c{CBM-@}color
          .byte c{CBM-@}backgr
          .rta pr{CBM-@}doslide
+         .rta pr{CBM-@}strtsl
          .rta pr{CBM-@}doloc
          .rta pr{CBM-@}docolor
          .rta pr{CBM-@}dobackgr
@@ -164,8 +180,38 @@ pr{CBM-@}dobackgr
          .block
          sty ystore
 
+         inc sl{CBM-@}cur
+
+         ; store new slide ptrs
+
+         ldx #0
+         ldy sl{CBM-@}ptrpg
+         #stxy ptr
+
+         lda sl{CBM-@}cur
+         ora #$80 ;set bit 7 for hi
+         tay
+         lda sl{CBM-@}seghi
+         sta (ptr),y
+
+         lda sl{CBM-@}seglo
+         ldy sl{CBM-@}cur  ;lo pages
+         sta (ptr),y
+
+         ; restore slide data ptr
+         ldx sl{CBM-@}seglo
+         ldy sl{CBM-@}seghi
+         #stxy ptr
+         ldy ystore
+         .bend
+
+pr{CBM-@}strtsl
+         .block
+         sty ystore
+
          ldx #0
          stx sl{CBM-@}row
+         stx sl{CBM-@}col
 
          #ldxy 0
          clc
@@ -236,11 +282,11 @@ pr{CBM-@}render ;render a segment of content
 
          ldy #0
 
-         lda pr{CBM-@}command
+         lda pr{CBM-@}cmd
          beq loop
 
-         sty pr{CBM-@}command
-         jsr pr{CBM-@}docmd
+         sty pr{CBM-@}cmd   ;clear command
+         jsr pr{CBM-@}docmd ;it's still in A
          bcs end
 
 loop     lda (ptr),y
@@ -292,7 +338,7 @@ docmd
          cmp #c{CBM-@}slide
          bne noslide
 
-         sta pr{CBM-@}command
+         sta pr{CBM-@}cmd
          beq pause
 noslide
          cmp #c{CBM-@}pause
@@ -322,7 +368,6 @@ nopause
          .bend
 
 pr{CBM-@}start
-pr{CBM-@}prevsl
 pr{CBM-@}nextsl
 pr{CBM-@}end
          ;Process next slide in pres
@@ -336,6 +381,37 @@ pr{CBM-@}end
          #ui{CBM-@}mkredraw
 
          clc ;Msg Handled
+         rts
+         .bend
+
+pr{CBM-@}prevsl
+         .block
+
+         ;set slide ptrs to prev slide
+         ldx #0
+         ldy sl{CBM-@}ptrpg
+         #stxy ptr
+
+         ldy sl{CBM-@}cur
+         beq end
+
+         dey
+         sty sl{CBM-@}cur
+
+         lda (ptr),y ;lo byte
+         sta sl{CBM-@}seglo
+
+         tya
+         ora #$80 ;set bit 7 for hi
+         tay
+         lda (ptr),y ;hi byte
+         sta sl{CBM-@}seghi
+
+         lda #c{CBM-@}prevsl
+         sta pr{CBM-@}cmd
+         jmp pr{CBM-@}end
+end
+         clc
          rts
          .bend
 

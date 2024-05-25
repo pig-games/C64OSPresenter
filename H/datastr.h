@@ -30,12 +30,13 @@ openfrpg .byte 0
 pr{CBM-@}bufpg .byte 0
 pr{CBM-@}bufsz .byte 0 ;size in pages
 pr{CBM-@}state .byte 0
-pr{CBM-@}command .byte 0
+pr{CBM-@}cmd   .byte 0
+pr{CBM-@}fbfpg .byte 0 ;field defs
 
-sl{CBM-@}curr  .byte 0
-sl{CBM-@}lopg  .byte 0
-sl{CBM-@}hipg  .byte 0
+sl{CBM-@}cur   .byte 0
+sl{CBM-@}ptrpg .byte 0
 
+sl{CBM-@}col   .byte 0
 sl{CBM-@}row   .byte 0
 sl{CBM-@}seglo .byte 0
 sl{CBM-@}seghi .byte 0

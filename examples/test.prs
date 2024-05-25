@@ -1,13 +1,18 @@
-!S
+!s
 
-!C00t!C03e!C04s!C05t !C14presentation
-!C03* bullet1
-!C07* bullet2
-!Sslide2
+!c00t!c03e!c04s!c05t !c14presentation
+!c03* bullet1
+!c07* bullet2
+!sslide2
 bla bla
-!P!L1010after pause
-* another !Pbullet
-!P* and another
-!L0001after locate
-!E
+!p!l1010after pause
+* another !pbullet
+!p* and another
+!l0001after locate
+!sThird slide
+!l0024Footer
+!sFourth slide
+
+bla bla 3
+!e
 
