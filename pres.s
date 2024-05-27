@@ -14,6 +14,7 @@ c{CBM-@}dfield = "d" ;Define field
 c{CBM-@}field  = "f" ;Insert field value
 c{CBM-@}loc    = "l" ;Change location
 c{CBM-@}home   = "h" ;Change home
+c{CBM-@}sttab  = "t" ;Set tab (indent)
 c{CBM-@}color  = "c" ;Set color
 c{CBM-@}backgr = "b" ;Set background color
 c{CBM-@}end    = "e" ;End
@@ -139,25 +140,19 @@ getnum   ;get 2 decimal number
          adc ystore
          asl a
          sta ystore
-         iny
-         bne *+4
-         inc ptr+1
+         #sl{CBM-@}inc{CBM-@}y
          lda (ptr),y
          sec
          sbc #48
          clc
          adc ystore
-         iny
-         bne *+4
-         inc ptr+1
+         #sl{CBM-@}inc{CBM-@}y
          rts
          .bend
 
 pr{CBM-@}docmd
          .block
-         iny
-         bne *+4
-         inc ptr+1
+         #sl{CBM-@}inc{CBM-@}y
 
          #switch 5
          .byte c{CBM-@}slide
@@ -176,7 +171,6 @@ pr{CBM-@}docmd
          .bend
 
 pr{CBM-@}doslide
-pr{CBM-@}dobackgr
          .block
          sty ystore
 
@@ -188,14 +182,14 @@ pr{CBM-@}dobackgr
          ldy sl{CBM-@}ptrpg
          #stxy ptr
 
-         lda sl{CBM-@}cur
+         lda sl{CBM-@}seglo
+         ldy sl{CBM-@}cur  ;lo pages
+         sta (ptr),y
+
+         tya
          ora #$80 ;set bit 7 for hi
          tay
          lda sl{CBM-@}seghi
-         sta (ptr),y
-
-         lda sl{CBM-@}seglo
-         ldy sl{CBM-@}cur  ;lo pages
          sta (ptr),y
 
          ; restore slide data ptr
@@ -203,6 +197,11 @@ pr{CBM-@}dobackgr
          ldy sl{CBM-@}seghi
          #stxy ptr
          ldy ystore
+
+         ; consume CR after !s
+         ; actually works with any char
+         #sl{CBM-@}inc{CBM-@}y
+
          .bend
 
 pr{CBM-@}strtsl
@@ -241,6 +240,13 @@ pr{CBM-@}docolor
          jsr setdprops
 
          ldy ystore
+
+         clc
+         rts
+         .bend
+
+pr{CBM-@}dobackgr
+         .block
 
          clc
          rts
@@ -325,9 +331,7 @@ end
 
 docmd
          ; get command code
-         iny
-         bne *+4
-         inc ptr+1
+         #sl{CBM-@}inc{CBM-@}y
 
          lda (ptr),y
          beq end
@@ -344,9 +348,7 @@ noslide
          cmp #c{CBM-@}pause
          bne nopause
 
-         iny
-         bne *+4
-         inc ptr+1
+         #sl{CBM-@}inc{CBM-@}y
 pause
          clc
          tya
@@ -399,12 +401,15 @@ pr{CBM-@}prevsl
          sty sl{CBM-@}cur
 
          lda (ptr),y ;lo byte
+         clc
+         adc #1 ;move past cr
          sta sl{CBM-@}seglo
 
          tya
          ora #$80 ;set bit 7 for hi
          tay
          lda (ptr),y ;hi byte
+         adc #0 ;move past cr
          sta sl{CBM-@}seghi
 
          lda #c{CBM-@}prevsl

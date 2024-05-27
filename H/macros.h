@@ -38,6 +38,13 @@ plyf     .macro
          ldy regstore+2
          .endm
 
+sl{CBM-@}inc{CBM-@}y .macro
+         iny
+         bne *+4
+         inc ptr+1
+         .endm
+
+
 pr{CBM-@}st{CBM-@}dirty .macro
          lda #1
          sta dirty
