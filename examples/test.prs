@@ -1,17 +1,20 @@
 !s
 
+
 !c00t!c03e!c04s!c05t !c14presentation
 !c03* bullet1
 !c07* bullet2
-!sslide2
+!s
+slide2
 bla bla
 !p!l1010after pause
 * another !pbullet
 !p* and another
 !l0001after locate
-!sThird slide
+!s
+Third slide
 !l0024Footer
-!sFourth slide
+!s Fourth slide
 
 bla bla 3
 !e
