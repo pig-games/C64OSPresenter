@@ -41,20 +41,20 @@ The following fields are defined:
 The bulk of a slide's content consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
 
 The following commands are supported:
-* __!s__\<CR\>: Start of a new slide/section. This command pauses the presentation, and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen. Note that this command needs to end with a CR (carriage return/new line).
+* __!s__\<CR\>: Start of a new slide/section. This command pauses the presentation, and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen. Note that this command needs to end with a CR (carriage return).
 * __!p__: Pause the current slide. This command pauses the presentation and when 'Next' is triggered, will continue any new content at the paused position.
 * **!c**xx: Changes the text color. It requires a two digit decimal number, between 0 and 15, immediately after the command.
 * **!b**xx: _(will be available in a later version)_ Changes the background color. It requires a two digit decimal number, between 0 and 15, immediately after the command. This command is mostly useful right after a __!s__ or __!p__ command. In the latter scenario it allows for changing background color after each pause, note that the full screen background is changed.
 * **!l**xxyy: Changes the ouput location. This command requires a two digit decimal numbers, the first for the new X coordinate (or column) the second for the new Y coordinate (or row). Note that as the screen has a resolution of 40x25 characters these values have to be between 0-39 and 0-24 respectively.
 * **!h**xxyy: _(will be available in a later version)_ Changes the output 'home'. This command is very similar to the **!l**xxyy command. However, it also 'remembers' the x-coordinate for any new lines following its use. This is very useful for adding 'blocks' of content to a slide, when combined with the __!p__ can be used creatively for 'builds' or 'animations' of 'blocks' of content anywhere in the slide while keeping the content 'around' it constant.
 * **!t**xx: _(will be available in a later version)_ Set the output 'tab' to possition xx. This command requires a two digit decimal number, between 0, 38 (the new start column). This command is similar to the **!h**xxyy command but it only sets the tab (indent) for new lines in the output. It can also be used there for to reset the indent after a **!h**xxyy to zero.
-* **!d**ff\<value\>\<CR\>: _(will be available in a later version)_ Defines a value for a field specified by a two character 'name' (ff). This command is typically used directly after a __!s__ command to define (new) field values that can be used in the slide/section following that command. Note that this command needs to end with a CR (carriage return/new line).
+* **!d**ff\<value\>\<CR\>: _(will be available in a later version)_ Defines a value for a field specified by a two character 'name' (ff). This command is typically used directly after a __!s__ command to define (new) field values that can be used in the slide/section following that command. Note that this command needs to end with a CR (carriage return).
 * **!f**ff: _(will be available in a later version)_ Is replaced by the value of the field specified by the two character 'name' (ff). These fields are described in chapter [[#Header]] (above).
 * **!i**\<cmd\>\<CR\>: _(will be available in a later version)_ Adds image support to presentations.  Note that this command needs to end with a CR (carriage return/new line). The __!i__ needs to be followed (before the CR) by a sub-command (\<cmd\>):
   * **!il**\<path\>: Loads a image file, specified with \<path\>, to the graphics screen. 
   * **!i**s: Show the currently loaded image (if available).
   * **!i**h: Hide the currently loaded image and therefore show the current slide again.
-* **!m**\<cmd\>\<CR\>: _(will be available in a later version)_ Adds SID music support to presentations. Note that there because of memory limits, SID files have to be relatively small to work inside a presentation. Note that this command has no visual impact on the slide. Note that this command needs to end with a CR (carriage return/new line). The __!m__ needs to be followed (before the CR) by a sub-command (\<cmd\>):
+* **!m**\<cmd\>\<CR\>: _(will be available in a later version)_ Adds SID music support to presentations. Note that there because of memory limits, SID files have to be relatively small to work inside a presentation. Note that this command has no visual impact on the slide. Note that this command needs to end with a CR (carriage return). The __!m__ needs to be followed (before the CR) by a sub-command (\<cmd\>):
   *  **!m**l\<path\>: Loads a SID file, specified with \<path\>. 
   *  **!m**sxx: Sets the playhead to the start of a numbered soung, using xx = 0 this returns the 'play head' to the start of the SID file.
   *  **!m**pss?: Starts playing the currently loaded SID file. It can optionally specify a maximum number of seconds to play the song.
@@ -62,18 +62,4 @@ The following commands are supported:
 * __!e__: Ends the presentation.
 
 The bulk of a presentation file consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
-
-The following commands are supported:
-* __!s__: Start of a new slide. This command pauses the presentation and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen.
-* __!p__: Pause the current slide. This command pauses the presentation and when 'Next' is triggered, will continue any new content at the paused position.
-* __!c__xx: Changes the text color. It requires a two digit decimal number, between 0 and 15, immediately after the command.
-* __!b__xx: Changes the background color. It requires a two digit decimal number, between 0 and 15, immediately after the command. This command is mostly useful right after a __!s__ or __!p__ command. In the latter scenario it allows for changing background color after each pause, note that the full screen background is changed.
-* __!l__xxyy: Changes the ouput location. This command requires a two digit decimal numbers, the first for the new X coordinate (or column) the second for the new Y coordinate (or row). Note that as the screen has a resolution of 40x25 characters these values have to be between 0-39 and 0-24 respectively.
-* __!h__xxyy: _(will be available in the next version)_ Changes the output 'home'. This command is very similar to the __!l__xxyy command. However, it also 'remembers' the x-coordinate for any new lines following its use. This is very useful for adding 'blocks' of content to a slide, when combined with the __!p__ can be used creatively for 'builds' or 'animations' of 'blocks' of content anywhere in the slide while keeping the content 'around' it constant.
-* __!i__'\<path\>': _(will be available in a later version)_ Loads an image, specified with \<path\> to the graphics screen (can be toggled with CMD-F). Note that the path needs to be enclosed by single quotes.
-* __!m__\<cmd\>: _(will be available in a later version)_ Adds SID music support to presentations. Note that there because of memory limits, SID files have to be relatively small to work inside a presentation. The __!m__ needs to be followed by a sub-command (\<cmd\>):
-  *  __!m__l'\<path\>': Loads a SID file, specified with \<path\>. Note that the path needs to be enclosed by single quotes.
-  *  __!m__s: Returns the 'play head' to the start of the SID file.
-  *  __!m__p: Toggles pause/play on the currently loaded SID file.
-* __!e__: Ends the presentation.
 
