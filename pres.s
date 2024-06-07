@@ -5,6 +5,9 @@
 defcolor .byte cblack
 defbcolor .byte cwhite
 
+vic{CBM-@}bgcol0 = $d021
+vic{CBM-@}bcol = $d020
+
 cr       = $0d ;Cariage return
 c{CBM-@}cmd    = "!" ;Command
 c{CBM-@}slide  = "s" ;Slide start
@@ -61,8 +64,15 @@ pr{CBM-@}init  ;Initialise presentation
          stx ystore
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
+         sta sl{CBM-@}max
+         lda defcolor
+         sta sl{CBM-@}fcol
+         lda defbcolor
+         sta sl{CBM-@}bcol
+         lda #1
+         sta sl{CBM-@}haspause
 
-         tya      ; A = pr{CBM-@}bufpg
+         tya      ;A = pr{CBM-@}bufpg
          ldy sl{CBM-@}ptrpg
          #stxy ptr
          ldy #$80 ;hi pages
@@ -173,7 +183,6 @@ pr{CBM-@}docmd
 pr{CBM-@}doslide
          .block
          sty ystore
-
          inc sl{CBM-@}cur
 
          ; store new slide ptrs
@@ -211,7 +220,8 @@ pr{CBM-@}strtsl
          ldx #0
          stx sl{CBM-@}row
          stx sl{CBM-@}col
-
+         ldx #1
+         stx sl{CBM-@}haspause
          #ldxy 0
          clc
          jsr setlrc
@@ -222,7 +232,7 @@ pr{CBM-@}strtsl
          ;Clear the Draw Context
          lda #" "
          jsr ctxclear
-
+end
          ldy ystore
 
          clc
@@ -234,6 +244,9 @@ pr{CBM-@}docolor
 
          jsr getnum
          sty ystore
+
+         sta sl{CBM-@}fcol
+
          ;Set Draws Properties and Color
          ldx #d{CBM-@}crsr{CBM-@}h.d{CBM-@}petscr
          tay
@@ -247,7 +260,20 @@ pr{CBM-@}docolor
 
 pr{CBM-@}dobackgr
          .block
+         ;get and set new color
+         jsr getnum
+         sty ystore
 
+         sta sl{CBM-@}bcol
+         sta tkcolors+c{CBM-@}bckgnd
+         sta tkcolors+c{CBM-@}border
+
+         jsr seeioker
+         sta vic{CBM-@}bgcol0
+         sta vic{CBM-@}bcol
+         jsr seeram
+
+         ldy ystore
          clc
          rts
          .bend
@@ -319,15 +345,11 @@ next     iny
          bne loop
          inc ptr+1
          bne loop
-
 end
          ldx #0
          ldy pr{CBM-@}bufpg
          #stxy sl{CBM-@}seglo
-
-         lda #s{CBM-@}ended
-         sta pr{CBM-@}state
-         rts
+         jmp pr{CBM-@}end
 
 docmd
          ; get command code
@@ -345,11 +367,31 @@ docmd
          sta pr{CBM-@}cmd
          beq pause
 noslide
+         cmp #c{CBM-@}end
+         bne noend
+
+         lda sl{CBM-@}cur
+         sta sl{CBM-@}max
+         clc
+         tya
+         adc ptr
+         sta sl{CBM-@}seglo
+         lda #0
+         adc ptr+1
+         sta sl{CBM-@}seghi
+         lda #s{CBM-@}paused
+         sta pr{CBM-@}state
+         clc
+         rts
+noend
          cmp #c{CBM-@}pause
          bne nopause
 
          #sl{CBM-@}inc{CBM-@}y
 pause
+         dec sl{CBM-@}haspause
+         lda #s{CBM-@}paused
+         sta pr{CBM-@}state
          clc
          tya
          adc ptr
@@ -358,48 +400,118 @@ pause
          adc ptr+1
          sta sl{CBM-@}seghi
 
-         lda #s{CBM-@}paused
-         sta pr{CBM-@}state
-
          rts
 nopause
          jsr pr{CBM-@}docmd
          bcs end
          jmp loop
-
          .bend
 
 pr{CBM-@}start
-pr{CBM-@}nextsl
-pr{CBM-@}end
-         ;Process next slide in pres
-         ;slidecmd -> current command
          .block
+         lda pr{CBM-@}state
+         beq ended
+
+         clc
+         rts
+
+ended    ;state is ended so we can start
+
+         lda redrawflgs
+         and #(rmenubar.rstatbar):$ff
+         jsr setflags
+
+         jsr pr{CBM-@}init
+         ;skip chars up to first !s
+         ldx sl{CBM-@}seglo
+         ldy sl{CBM-@}seghi
+         #stxy ptr
+         ldy #0
+loop
+         lda (ptr),y
+         beq end
+         cmp #c{CBM-@}cmd
+         bne next
+
+         ;get command code
+         #sl{CBM-@}inc{CBM-@}y
+
+         lda (ptr),y
+         beq end
+
+         cmp #c{CBM-@}slide
+         bne end
+         sta pr{CBM-@}cmd
 
          lda #s{CBM-@}render
          sta pr{CBM-@}state
+
+         clc
+         tya
+         adc ptr
+         sta sl{CBM-@}seglo
+         lda #0
+         adc ptr+1
+         sta sl{CBM-@}seghi
 
          #pr{CBM-@}st{CBM-@}dirty
          #ui{CBM-@}mkredraw
 
          clc ;Msg Handled
          rts
+
+next     iny
+         bne loop
+         inc ptr+1
+         bne loop
+
+end
+         jmp pr{CBM-@}end
+
+         .bend
+
+pr{CBM-@}nextsl
+         ;Process next slide in pres
+         ;slidecmd -> current command
+         .block
+         lda pr{CBM-@}state
+         beq end
+
+         lda sl{CBM-@}cur
+         cmp sl{CBM-@}max
+         bcs end
+
+         lda #s{CBM-@}render
+         sta pr{CBM-@}state
+
+         #pr{CBM-@}st{CBM-@}dirty
+         #ui{CBM-@}mkredraw
+end
+         clc ;Msg Handled
+         rts
          .bend
 
 pr{CBM-@}prevsl
          .block
+         lda pr{CBM-@}state
+         beq end
 
-         ;set slide ptrs to prev slide
          ldx #0
          ldy sl{CBM-@}ptrpg
          #stxy ptr
 
          ldy sl{CBM-@}cur
+
+         lda sl{CBM-@}haspause
+         bmi haspause
+
+         cpy #0
          beq end
 
+         ;set slide ptrs to prev slide
          dey
          sty sl{CBM-@}cur
-
+haspause
          lda (ptr),y ;lo byte
          clc
          adc #1 ;move past cr
@@ -414,8 +526,44 @@ pr{CBM-@}prevsl
 
          lda #c{CBM-@}prevsl
          sta pr{CBM-@}cmd
-         jmp pr{CBM-@}end
+         lda #s{CBM-@}render
+         sta pr{CBM-@}state
+         lda #1
+         sta sl{CBM-@}haspause
+
+         #pr{CBM-@}st{CBM-@}dirty
+         #ui{CBM-@}mkredraw
 end
+         clc
+         rts
+         .bend
+
+pr{CBM-@}end
+         .block
+
+         ;restore theme colors
+
+         ldx bk{CBM-@}bgcol
+         stx tkcolors+c{CBM-@}bckgnd
+         ldy bk{CBM-@}bcol
+         sty tkcolors+c{CBM-@}border
+
+         jsr seeioker
+         stx vic{CBM-@}bgcol0
+         sty vic{CBM-@}bcol
+         jsr seeram
+
+         lda redrawflgs
+         ora #rmenubar
+         ora #rstatbar
+         jsr setflags
+
+         lda #s{CBM-@}ended
+         sta pr{CBM-@}state
+
+         #pr{CBM-@}st{CBM-@}dirty
+         #ui{CBM-@}mkredraw
+
          clc
          rts
          .bend

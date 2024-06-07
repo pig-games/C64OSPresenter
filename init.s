@@ -45,7 +45,10 @@ init
 
          ;Initialize UI
 
-         ;jsr pr{CBM-@}init
+         lda tkcolors+c{CBM-@}bckgnd
+         sta bk{CBM-@}bgcol
+         lda tkcolors+c{CBM-@}border
+         sta bk{CBM-@}bcol
 
          rts
          .bend

@@ -1,11 +1,12 @@
+This a test presentation
 !s
-
+!b15
 
 !c00t!c03e!c04s!c05t !c14presentation
-!c03* bullet1
+!c03* bullet1!p!b03
 !c07* bullet2
 !s
-slide2
+!b14slide2
 bla bla
 !p!l1010after pause
 * another !pbullet
@@ -14,8 +15,7 @@ bla bla
 !s
 Third slide
 !l0024Footer
-!s Fourth slide
+!s Fourth
 
 bla bla 3
 !e
-

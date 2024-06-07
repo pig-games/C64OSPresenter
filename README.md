@@ -6,11 +6,13 @@ By now it has new file format that enables more features.
 The file format is a very simple petscii format that can be created and edited with standard C64 text editors like Novatext.
 
 # File format
-Presentation files are sequence files that are required to have the '.prs' file extension.# File format
-
 Presentation files are sequence files that are required to have the '.prs' file extension.
-
 The bulk of a presentation file consists of standard petsii text.
+
+## Comment section
+
+At the start of a presentation it is allowed to include a text segment that provides comments about the presentation. This can be any text of any lenght. This segment is closed by the first __!s__\<CR\> command. This must be the first command of each presentation file.
+
 ## Fields
 The presenter app supports 'fields' that can be used to add short (max 40 character) reusable text fragments that can be added anywhere in the content of a slide with the __!Fff__ command described in the chapter [[#Slides]].
 

@@ -4,6 +4,31 @@ open{CBM-@}ut  .null "Open"
 fileext  .text ".prs"
 fileextl = *-fileext
 
+willfrz
+         .block
+         ;restore theme colors
+
+         ldx bk{CBM-@}bgcol
+         stx tkcolors+c{CBM-@}bckgnd
+         ldy bk{CBM-@}bcol
+         sty tkcolors+c{CBM-@}border
+
+         rts
+         .bend
+
+willthw
+         .block
+         lda sl{CBM-@}bcol
+         sta tkcolors+c{CBM-@}bckgnd
+         sta tkcolors+c{CBM-@}border
+
+         jsr seeioker
+         sta vic{CBM-@}bgcol0
+         sta vic{CBM-@}bcol
+         jsr seeram
+
+         rts
+         .bend
 
 willquit
          .block
@@ -161,7 +186,7 @@ drawmain ;Main draw routine
 
          ;Set Draws Properties and Color
          ldx #d{CBM-@}crsr{CBM-@}h.d{CBM-@}petscr
-         ldy defcolor
+         ldy sl{CBM-@}fcol
          jsr setdprops
 
          lda pr{CBM-@}bufsz
