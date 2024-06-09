@@ -46,9 +46,13 @@ init
          ;Initialize UI
 
          lda tkcolors+c{CBM-@}bckgnd
+         sta sl{CBM-@}bgcol
          sta bk{CBM-@}bgcol
          lda tkcolors+c{CBM-@}border
+         sta sl{CBM-@}bcol
          sta bk{CBM-@}bcol
+         lda #0
+         sta pr{CBM-@}state
 
          rts
          .bend

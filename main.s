@@ -5,6 +5,7 @@
 
          #inc{CBM-@}s "app"
          #inc{CBM-@}s "colors"
+         #inc{CBM-@}s "ctxcolors"
          #inc{CBM-@}s "ctxdraw"
          #inc{CBM-@}s "io"
          #inc{CBM-@}s "pointer"
@@ -53,6 +54,7 @@ quitapp  #syscall lser,quitapp{CBM-@}
 loadlib  #syscall lser,loadlib{CBM-@}
 unldlib  #syscall lser,unldlib{CBM-@}
 loadutil #syscall lser,loadutil{CBM-@}
+setflags #syscall lser,setflags{CBM-@}
 
          #inc{CBM-@}h "toolkit"
 setctx   #syscall ltkt,setctx{CBM-@}

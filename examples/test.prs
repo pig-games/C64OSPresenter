@@ -4,7 +4,7 @@ This a test presentation
 
 !c00t!c03e!c04s!c05t !c14presentation
 !c03* bullet1!p!b03
-!c07* bullet2
+!t05!c07* bullet2
 !s
 !b14slide2
 bla bla
@@ -13,9 +13,9 @@ bla bla
 !p* and another
 !l0001after locate
 !s
-Third slide
+Third
 !l0024Footer
-!s Fourth
-
-bla bla 3
+!w0410box
+box
+!t00back
 !e

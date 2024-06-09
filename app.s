@@ -18,13 +18,21 @@ willfrz
 
 willthw
          .block
-         lda sl{CBM-@}bcol
-         sta tkcolors+c{CBM-@}bckgnd
-         sta tkcolors+c{CBM-@}border
+         lda pr{CBM-@}state
+         beq ended
+         ldx sl{CBM-@}bgcol
+         ldy sl{CBM-@}bcol
+         jmp restore
+ended
+         ldx bk{CBM-@}bgcol
+         ldy bk{CBM-@}bcol
+restore
+         stx tkcolors+c{CBM-@}bckgnd
+         sty tkcolors+c{CBM-@}border
 
          jsr seeioker
-         sta vic{CBM-@}bgcol0
-         sta vic{CBM-@}bcol
+         stx vic{CBM-@}bgcol0
+         sty vic{CBM-@}bcol
          jsr seeram
 
          rts

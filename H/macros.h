@@ -62,7 +62,8 @@ ui{CBM-@}newline .macro
          ldy #0
          clc
          jsr setlrc
-         #ldxy 0
+         ldx sl{CBM-@}col
+         ldy #0
          sec
          jsr setlrc
          .endm

@@ -40,6 +40,7 @@ sl{CBM-@}ptrpg .byte 0
 sl{CBM-@}haspause .byte 0
 sl{CBM-@}fcol  .byte 0
 sl{CBM-@}bcol  .byte 0
+sl{CBM-@}bgcol .byte 0
 sl{CBM-@}col   .byte 0
 sl{CBM-@}row   .byte 0
 sl{CBM-@}seglo .byte 0

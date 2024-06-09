@@ -16,7 +16,7 @@ c{CBM-@}pause  = "p" ;Pause output
 c{CBM-@}dfield = "d" ;Define field
 c{CBM-@}field  = "f" ;Insert field value
 c{CBM-@}loc    = "l" ;Change location
-c{CBM-@}home   = "h" ;Change home
+c{CBM-@}window = "w" ;Change window
 c{CBM-@}sttab  = "t" ;Set tab (indent)
 c{CBM-@}color  = "c" ;Set color
 c{CBM-@}backgr = "b" ;Set background color
@@ -65,10 +65,6 @@ pr{CBM-@}init  ;Initialise presentation
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
          sta sl{CBM-@}max
-         lda defcolor
-         sta sl{CBM-@}fcol
-         lda defbcolor
-         sta sl{CBM-@}bcol
          lda #1
          sta sl{CBM-@}haspause
 
@@ -164,15 +160,19 @@ pr{CBM-@}docmd
          .block
          #sl{CBM-@}inc{CBM-@}y
 
-         #switch 5
+         #switch 7
          .byte c{CBM-@}slide
          .byte c{CBM-@}prevsl
          .byte c{CBM-@}loc
+         .byte c{CBM-@}window
+         .byte c{CBM-@}sttab
          .byte c{CBM-@}color
          .byte c{CBM-@}backgr
          .rta pr{CBM-@}doslide
          .rta pr{CBM-@}strtsl
          .rta pr{CBM-@}doloc
+         .rta pr{CBM-@}dowindow
+         .rta pr{CBM-@}dotab
          .rta pr{CBM-@}docolor
          .rta pr{CBM-@}dobackgr
 
@@ -264,8 +264,9 @@ pr{CBM-@}dobackgr
          jsr getnum
          sty ystore
 
-         sta sl{CBM-@}bcol
+         sta sl{CBM-@}bgcol
          sta tkcolors+c{CBM-@}bckgnd
+         sta sl{CBM-@}bcol
          sta tkcolors+c{CBM-@}border
 
          jsr seeioker
@@ -278,7 +279,14 @@ pr{CBM-@}dobackgr
          rts
          .bend
 
+pr{CBM-@}dowindow
+         lda #1
+         pha
+         bne dowin
 pr{CBM-@}doloc
+         lda #0
+         pha
+dowin
          .block
          ; get column
          jsr getnum
@@ -295,11 +303,35 @@ pr{CBM-@}doloc
 
          pla ;restore column
          tax
+         pla ;get tab switch
+         beq notab
+         stx sl{CBM-@}col
+notab
+         ldy #0
+         sec
+         jsr setlrc
+
+         ldy ystore
+         clc
+         rts
+         .bend
+
+pr{CBM-@}dotab
+         .block
+         jsr getnum
+         pha
+         sty ystore
+         ldx sl{CBM-@}row
+         ldy #0
+         clc
+         jsr setlrc
+         pla
+         sta sl{CBM-@}col
+         tax
          ldy #0
          sec
          jsr setlrc
          ldy ystore
-
          clc
          rts
          .bend
@@ -544,8 +576,8 @@ pr{CBM-@}end
          ;restore theme colors
 
          ldx bk{CBM-@}bgcol
-         stx tkcolors+c{CBM-@}bckgnd
          ldy bk{CBM-@}bcol
+         stx tkcolors+c{CBM-@}bckgnd
          sty tkcolors+c{CBM-@}border
 
          jsr seeioker
