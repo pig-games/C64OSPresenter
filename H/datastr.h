@@ -23,6 +23,8 @@ drawctx  .word 0
 
 openfrpg .byte 0
 
+chrsbkpg .byte 0
+
 ;---------------------------------------
 ; Presentation state
 ;---------------------------------------
@@ -52,7 +54,7 @@ bk{CBM-@}bcol  .byte 0
 
 ptr      = $fb;$fc
 
-slideptr = $fd;$fe
+ptr2     = $fd;$fe
 
 slidecmd .byte 0
 

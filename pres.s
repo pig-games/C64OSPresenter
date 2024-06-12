@@ -486,6 +486,9 @@ loop
          adc ptr+1
          sta sl{CBM-@}seghi
 
+         ldy #$d8
+         jsr setchrs
+
          #pr{CBM-@}st{CBM-@}dirty
          #ui{CBM-@}mkredraw
 
@@ -572,6 +575,8 @@ end
 
 pr{CBM-@}end
          .block
+         ldy chrsbkpg
+         jsr setchrs
 
          ;restore theme colors
 
@@ -584,6 +589,10 @@ pr{CBM-@}end
          stx vic{CBM-@}bgcol0
          sty vic{CBM-@}bcol
          jsr seeram
+
+         ;Clear the Draw Context
+         lda #" "
+         jsr ctxclear
 
          lda redrawflgs
          ora #rmenubar

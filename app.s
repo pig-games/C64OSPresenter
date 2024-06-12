@@ -4,6 +4,51 @@ open{CBM-@}ut  .null "Open"
 fileext  .text ".prs"
 fileextl = *-fileext
 
+cpychrs  ;a=src, y=tar, x=numpg
+         .block
+loop
+         jsr memcpy
+         clc
+         adc #1
+         iny
+         dex
+         bne loop
+         rts
+         .bend
+
+restchrs ;y = source
+         .block
+         sei
+         lda $01
+         pha
+         jsr seeram
+         tya
+         ldy #$d0
+         ldx #8
+         jsr cpychrs
+         pla
+         sta $01
+         cli
+         rts
+         .bend
+
+setchrs  ;y = sourcepg
+         .block
+         sei
+         lda $01
+         and #%11111011 ;Enable charrom
+         sta $01
+         tya
+         ldy #$d0
+         ldx #8
+         jsr cpychrs
+         lda $01
+         ora #%00000100 ;Disable charrom
+         sta $01
+         cli
+         rts
+         .bend
+
 willfrz
          .block
          ;restore theme colors
@@ -13,6 +58,9 @@ willfrz
          ldy bk{CBM-@}bcol
          sty tkcolors+c{CBM-@}border
 
+         ldy chrsbkpg
+         jsr restchrs
+
          rts
          .bend
 
@@ -20,6 +68,10 @@ willthw
          .block
          lda pr{CBM-@}state
          beq ended
+
+         ldy #$d8
+         jsr setchrs
+
          ldx sl{CBM-@}bgcol
          ldy sl{CBM-@}bcol
          jmp restore
@@ -40,6 +92,9 @@ restore
 
 willquit
          .block
+         ;Restore theme & charset
+         jsr willfrz
+
          ;Dealloc Resources
 
          ;free display buffers
@@ -48,6 +103,9 @@ willquit
          jsr pgfree
          ldx #4
          ldy drawctx+d{CBM-@}origin+1
+         jsr pgfree
+         ldx #8
+         ldy chrsbkpg
          jsr pgfree
 
          ;free slide location buffers

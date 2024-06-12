@@ -48,6 +48,7 @@ fclose   #syscall lfil,fclose{CBM-@}
          #inc{CBM-@}h "memory"
 pgalloc  #syscall lmem,pgalloc{CBM-@}
 pgfree   #syscall lmem,pgfree{CBM-@}
+memcpy   #syscall lmem,memcpy{CBM-@}
 
          #inc{CBM-@}h "service"
 quitapp  #syscall lser,quitapp{CBM-@}

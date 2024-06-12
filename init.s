@@ -28,6 +28,18 @@ init
          jsr pgalloc
          sty sl{CBM-@}ptrpg
 
+         lda #mapapp
+         ldx #8
+         jsr pgalloc
+         sty chrsbkpg
+
+         ;Backup charset
+         lda #$d0
+         ldx #8
+         jsr seeram
+         jsr cpychrs
+         jsr seeioker
+
          ;Load Shared Libraries
 
          ldx #"p"
