@@ -61,7 +61,5 @@ The following commands are supported:
   *  **!m**sxx: Sets the playhead to the start of a numbered soung, using xx = 0 this returns the 'play head' to the start of the SID file.
   *  **!m**pss?: Starts playing the currently loaded SID file. It can optionally specify a maximum number of seconds to play the song.
   *  **!m**e: Stops playing the currently playing SID file.
-* __!e__: Ends the presentation.
-
-The bulk of a presentation file consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
+* __!e__: Marks the end of the presentation.
 
