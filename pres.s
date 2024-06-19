@@ -18,6 +18,7 @@ c{CBM-@}field  = "f" ;Insert field value
 c{CBM-@}loc    = "l" ;Change location
 c{CBM-@}window = "w" ;Change window
 c{CBM-@}sttab  = "t" ;Set tab (indent)
+c{CBM-@}clend  = "{CBM-@}" ;Clear to line end
 c{CBM-@}color  = "c" ;Set color
 c{CBM-@}backgr = "b" ;Set background color
 c{CBM-@}end    = "e" ;End
@@ -25,6 +26,7 @@ c{CBM-@}end    = "e" ;End
 s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
 s{CBM-@}render = 2
+
 
 pr{CBM-@}free  ;Free open pres mem
          .block
@@ -59,6 +61,7 @@ pr{CBM-@}init  ;Initialise presentation
          stx sl{CBM-@}seglo
          sty sl{CBM-@}seghi
          stx sl{CBM-@}row
+         stx sl{CBM-@}curcol
          stx sl{CBM-@}col
          stx pr{CBM-@}state
          stx ystore
@@ -84,8 +87,11 @@ pr{CBM-@}load  ;Load presentation
          ;regptr -> file ref struct
          .block
 
+         lda pr{CBM-@}state
+         beq ended
+         jsr pr{CBM-@}end
+ended
          ;free existing pres mem
-
          #phyf
          jsr pr{CBM-@}free
          #plyf
@@ -127,7 +133,6 @@ rsize    .word $00
 
          jsr pr{CBM-@}init
          #pr{CBM-@}st{CBM-@}dirty
-
          #ui{CBM-@}mkredraw
 
 done     clc
@@ -160,12 +165,13 @@ pr{CBM-@}docmd
          .block
          #sl{CBM-@}inc{CBM-@}y
 
-         #switch 7
+         #switch 8
          .byte c{CBM-@}slide
          .byte c{CBM-@}prevsl
          .byte c{CBM-@}loc
          .byte c{CBM-@}window
          .byte c{CBM-@}sttab
+         .byte c{CBM-@}clend
          .byte c{CBM-@}color
          .byte c{CBM-@}backgr
          .rta pr{CBM-@}doslide
@@ -173,6 +179,7 @@ pr{CBM-@}docmd
          .rta pr{CBM-@}doloc
          .rta pr{CBM-@}dowindow
          .rta pr{CBM-@}dotab
+         .rta pr{CBM-@}doclend
          .rta pr{CBM-@}docolor
          .rta pr{CBM-@}dobackgr
 
@@ -220,6 +227,7 @@ pr{CBM-@}strtsl
          ldx #0
          stx sl{CBM-@}row
          stx sl{CBM-@}col
+         stx sl{CBM-@}curcol
          ldx #1
          stx sl{CBM-@}haspause
          #ldxy 0
@@ -290,6 +298,7 @@ dowin
          .block
          ; get column
          jsr getnum
+         sta sl{CBM-@}curcol
          pha ;save column
 
          ; get row
@@ -327,11 +336,28 @@ pr{CBM-@}dotab
          jsr setlrc
          pla
          sta sl{CBM-@}col
+         sta sl{CBM-@}curcol
          tax
          ldy #0
          sec
          jsr setlrc
          ldy ystore
+         clc
+         rts
+         .bend
+
+pr{CBM-@}doclend
+         .block
+         ldx sl{CBM-@}curcol
+loop
+         cpx #39
+         bcs end
+         lda #$20
+         jsr ctxdraw
+         inx
+         jmp loop
+end
+         stx sl{CBM-@}curcol
          clc
          rts
          .bend
@@ -372,6 +398,7 @@ printchr
          bne *+4
          lda #$20
          jsr ctxdraw
+         inc sl{CBM-@}curcol
 
 next     iny
          bne loop
@@ -575,6 +602,8 @@ end
 
 pr{CBM-@}end
          .block
+         lda pr{CBM-@}state
+         beq done
          ldy chrsbkpg
          jsr setchrs
 
@@ -604,7 +633,7 @@ pr{CBM-@}end
 
          #pr{CBM-@}st{CBM-@}dirty
          #ui{CBM-@}mkredraw
-
+done
          clc
          rts
          .bend

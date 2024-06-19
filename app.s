@@ -87,6 +87,16 @@ restore
          sty vic{CBM-@}bcol
          jsr seeram
 
+         ;Open file if applicable
+         lda opnappmcmd
+         cmp #mc{CBM-@}fopn
+         bne done
+
+         ldy opnappmdhi
+         ldx #0
+         stx opnappmcmd
+         jsr pr{CBM-@}load
+done
          rts
          .bend
 
@@ -256,14 +266,16 @@ drawmain ;Main draw routine
          jsr setdprops
 
          lda pr{CBM-@}bufsz
-         bne havefile
-
+         beq nofile
+         lda pr{CBM-@}state
+         bne render
+nofile
          ;Clear the Draw Context
          lda #" "
          jsr ctxclear
          jmp done
 
-havefile ;dirty and have file
+render   ;dirty and have file
          ;presentation output
 
          lda pr{CBM-@}state

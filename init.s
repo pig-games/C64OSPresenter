@@ -66,6 +66,17 @@ init
          lda #0
          sta pr{CBM-@}state
 
+         ;Open file if applicable
+         lda opnappmcmd
+         cmp #mc{CBM-@}fopn
+         bne done
+
+         ldy opnappmdhi
+         ldx #0
+         stx opnappmcmd
+         jsr pr{CBM-@}load
+
+done
          rts
          .bend
 
