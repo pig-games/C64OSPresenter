@@ -66,6 +66,18 @@ willfrz
 
 willthw
          .block
+         ;Open file if applicable
+         lda opnappmcmd
+         cmp #mc{CBM-@}fopn
+         bne notopnf
+
+         ldy opnappmdhi
+         ldx #0
+         stx opnappmcmd
+         jsr pr{CBM-@}load
+         jsr pr{CBM-@}end
+
+notopnf
          lda pr{CBM-@}state
          beq ended
 
@@ -87,15 +99,6 @@ restore
          sty vic{CBM-@}bcol
          jsr seeram
 
-         ;Open file if applicable
-         lda opnappmcmd
-         cmp #mc{CBM-@}fopn
-         bne done
-
-         ldy opnappmdhi
-         ldx #0
-         stx opnappmcmd
-         jsr pr{CBM-@}load
 done
          rts
          .bend
@@ -160,7 +163,34 @@ done     sec
 
 mnuenq   ;X -> Menu Action Code
          lda #0 ;Enabled, Not selected
+         .block
+         txa
+         ldx #0
+         #switch 5
+         .text "ospne"
+         .rta chkend
+         .rta chkend
+         .rta chkstrt
+         .rta chkstrt
+         .rta chkstrt
+         lda #0
          rts
+
+chkend
+         lda pr{CBM-@}state
+         beq ended
+         ldx #mnu{CBM-@}dis
+ended
+         txa
+         rts
+chkstrt
+         lda pr{CBM-@}state
+         bne started
+         ldx #mnu{CBM-@}dis
+started
+         txa
+         rts
+         .bend
 
 mnucmd   ;X -> Menu Action Code
          txa
