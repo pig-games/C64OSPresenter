@@ -87,10 +87,6 @@ pr{CBM-@}load  ;Load presentation
          ;regptr -> file ref struct
          .block
 
-;         lda pr{CBM-@}state
-;         beq ended
-;         jsr pr{CBM-@}end
-;ended
          ;free existing pres mem
          #phyf
          jsr pr{CBM-@}free
@@ -602,8 +598,6 @@ end
 
 pr{CBM-@}end
          .block
-         lda pr{CBM-@}state
-         beq done
          ldy chrsbkpg
          jsr setchrs
 
