@@ -21,11 +21,6 @@ init
          lda #mapapp
          ldx #1
          jsr pgalloc
-         sty pr{CBM-@}fbfpg
-
-         lda #mapapp
-         ldx #1
-         jsr pgalloc
          sty sl{CBM-@}ptrpg
 
          lda #mapapp

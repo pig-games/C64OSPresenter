@@ -45,10 +45,16 @@ pr{CBM-@}free  ;Free open pres mem
          ldx pr{CBM-@}bufsz
          jsr pgfree
 
+         ;Free fields
+         ldx #1
+         ldy pr{CBM-@}fdpg
+         jsr pgfree
+
          lda #0
          sta opnfileref+1
          sta pr{CBM-@}bufpg
          sta pr{CBM-@}bufsz
+         sta pr{CBM-@}fdpg
 done
          rts
          .bend
@@ -68,6 +74,8 @@ pr{CBM-@}init  ;Initialise presentation
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
          sta sl{CBM-@}max
+         sta sl{CBM-@}felo
+         sta sl{CBM-@}fehi
          lda #1
          sta sl{CBM-@}haspause
 
@@ -125,6 +133,20 @@ rsize    .word $00
 
          jsr fclose
 
+         ;allocate field buffer
+         lda #mapapp
+         ldx #1
+         jsr pgalloc
+         sty pr{CBM-@}fdpg
+         ;clear non zero bytes 0 and 2
+         ldx #0
+         #stxy ptr
+         ldy #0
+         lda #0
+         sta (ptr),y
+         ldy #2
+         sta (ptr),y
+
          ;trigger pres redraw
 
          jsr pr{CBM-@}init
@@ -161,7 +183,7 @@ pr{CBM-@}docmd
          .block
          #sl{CBM-@}inc{CBM-@}y
 
-         #switch 8
+         #switch 10
          .byte c{CBM-@}slide
          .byte c{CBM-@}prevsl
          .byte c{CBM-@}loc
@@ -170,6 +192,8 @@ pr{CBM-@}docmd
          .byte c{CBM-@}clend
          .byte c{CBM-@}color
          .byte c{CBM-@}backgr
+         .byte c{CBM-@}dfield
+         .byte c{CBM-@}field
          .rta pr{CBM-@}doslide
          .rta pr{CBM-@}strtsl
          .rta pr{CBM-@}doloc
@@ -178,6 +202,8 @@ pr{CBM-@}docmd
          .rta pr{CBM-@}doclend
          .rta pr{CBM-@}docolor
          .rta pr{CBM-@}dobackgr
+         .rta pr{CBM-@}dodfield
+         .rta pr{CBM-@}dofield
 
          sec
          rts
@@ -354,6 +380,118 @@ loop
          jmp loop
 end
          stx sl{CBM-@}curcol
+         clc
+         rts
+         .bend
+
+labelbuf .word 0
+
+pr{CBM-@}dodfield
+         .block
+
+         sty ystore
+         ;point ptr2 to field buffer
+         ldx #0
+         ldy pr{CBM-@}fdpg
+         #stxy ptr2
+
+         ;read 1st char field name
+         ldy ystore
+         lda (ptr),y
+         sta labelbuf
+         #sl{CBM-@}inc{CBM-@}y
+
+         ;read 2nd char field name
+         lda (ptr),y
+         sta labelbuf+1
+         #sl{CBM-@}inc{CBM-@}y
+         sty ystore
+
+         ldx #4
+loop
+         ldy #0
+         lda (ptr2),y
+         beq store ;empty slot, so store
+         cmp labelbuf
+         bne nomatch
+
+         iny
+         lda (ptr2),y
+         cmp labelbuf+1
+         beq store
+
+nomatch
+         lda #6
+         clc
+         adc ptr2
+         bcs end
+         sta ptr2
+         dex
+         bne loop
+         beq end
+
+store    ;set ptr to start of value
+         ldy #0
+         lda labelbuf
+         sta (ptr2),y
+         iny
+         lda labelbuf+1
+         sta (ptr2),y
+         ldy ystore
+         tya
+
+         clc
+         adc ptr
+         sta ptr
+         ldy #2
+         sta (ptr2),y
+         lda #0
+         adc ptr+1
+         sta ptr+1
+         ldy #3
+         sta (ptr2),y
+         ldy #0
+         sty ystore
+
+         ;find !e
+eloop
+         lda (ptr),y
+
+         beq end
+         #sl{CBM-@}inc{CBM-@}y
+         cmp #c{CBM-@}cmd
+         bne eloop
+
+         lda (ptr),y
+         beq end
+         #sl{CBM-@}inc{CBM-@}y
+         cmp #c{CBM-@}end
+         bne eloop
+
+         ;store ptr in slot
+         tya
+
+         clc
+         adc ptr
+         sta ptr
+         ldy #4
+         sta (ptr2),y
+         lda #0
+         adc ptr+1
+         sta ptr+1
+         ldy #5
+         sta (ptr2),y
+         ldy #0
+         sty ystore
+
+end
+         clc
+         rts
+         .bend
+
+pr{CBM-@}dofield
+         .block
+
          clc
          rts
          .bend

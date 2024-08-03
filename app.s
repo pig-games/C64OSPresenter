@@ -123,9 +123,6 @@ willquit
 
          ;free slide location buffers
          ldx #1
-         ldy pr{CBM-@}fbfpg
-         jsr pgfree
-         ldx #1
          ldy sl{CBM-@}ptrpg
          jsr pgfree
 

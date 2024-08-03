@@ -33,7 +33,7 @@ pr{CBM-@}bufpg .byte 0
 pr{CBM-@}bufsz .byte 0 ;size in pages
 pr{CBM-@}state .byte 0
 pr{CBM-@}cmd   .byte 0
-pr{CBM-@}fbfpg .byte 0 ;field defs
+pr{CBM-@}fdpg  .byte 0 ;field defs
 
 sl{CBM-@}cur   .byte 0
 sl{CBM-@}max   .byte 0
@@ -48,6 +48,8 @@ sl{CBM-@}col   .byte 0
 sl{CBM-@}row   .byte 0
 sl{CBM-@}seglo .byte 0
 sl{CBM-@}seghi .byte 0
+sl{CBM-@}felo  .byte 0
+sl{CBM-@}fehi  .byte 0
 
 bk{CBM-@}fcol  .byte 0
 bk{CBM-@}bgcol .byte 0
