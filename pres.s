@@ -71,11 +71,10 @@ pr{CBM-@}init  ;Initialise presentation
          stx sl{CBM-@}col
          stx pr{CBM-@}state
          stx ystore
+         stx sl{CBM-@}infld
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
          sta sl{CBM-@}max
-         sta sl{CBM-@}felo
-         sta sl{CBM-@}fehi
          lda #1
          sta sl{CBM-@}haspause
 
@@ -138,13 +137,15 @@ rsize    .word $00
          ldx #1
          jsr pgalloc
          sty pr{CBM-@}fdpg
-         ;clear non zero bytes 0 and 2
+         ;clear non zero bytes 0 to 2
          ldx #0
          #stxy ptr
          ldy #0
          lda #0
          sta (ptr),y
-         ldy #2
+         iny
+         sta (ptr),y
+         iny
          sta (ptr),y
 
          ;trigger pres redraw
@@ -214,22 +215,36 @@ pr{CBM-@}doslide
          sty ystore
          inc sl{CBM-@}cur
 
-         ; store new slide ptrs
-
          ldx #0
          ldy sl{CBM-@}ptrpg
          #stxy ptr
 
-         lda sl{CBM-@}seglo
-         ldy sl{CBM-@}cur  ;lo pages
-         sta (ptr),y
-
-         tya
+         ;check for existing sl ptr
+         lda sl{CBM-@}cur
+         pha ;backup sl cur
          ora #$80 ;set bit 7 for hi
          tay
+         lda (ptr),y
+         beq noslptr
+
+         ;use stored ptr
+         sta sl{CBM-@}seghi
+         pla
+         tay
+         lda (ptr),y
+         sta sl{CBM-@}seglo
+         jmp setslptr
+
+noslptr
          lda sl{CBM-@}seghi
          sta (ptr),y
 
+         pla ;restore y
+         tay
+         lda sl{CBM-@}seglo
+         sta (ptr),y
+
+setslptr
          ; restore slide data ptr
          ldx sl{CBM-@}seglo
          ldy sl{CBM-@}seghi
@@ -385,10 +400,11 @@ end
          .bend
 
 labelbuf .word 0
+fldstack .word 0,0,0,0,0,0,0,0
 
-pr{CBM-@}dodfield
+find{CBM-@}slot
          .block
-
+         pha ;store match on empty
          sty ystore
          ;point ptr2 to field buffer
          ldx #0
@@ -407,39 +423,66 @@ pr{CBM-@}dodfield
          #sl{CBM-@}inc{CBM-@}y
          sty ystore
 
-         ldx #4
+         ldx #$ff
 loop
          ldy #0
+         pla ;restore match on empty
+         pha
+         beq noempty
          lda (ptr2),y
-         beq store ;empty slot, so store
+         beq found{CBM-@}slot ;so store
+noempty
+         lda (ptr2),y
          cmp labelbuf
          bne nomatch
 
          iny
          lda (ptr2),y
          cmp labelbuf+1
-         beq store
+         beq found{CBM-@}slot
 
 nomatch
-         lda #6
+         lda #4
          clc
          adc ptr2
-         bcs end
+         bcs err{CBM-@}ovfl
          sta ptr2
          dex
          bne loop
-         beq end
 
-store    ;set ptr to start of value
+err{CBM-@}full ;TODO error handling
+         pla
+         sec
+         rts
+
+err{CBM-@}ovfl
+         pla
+         sec
+         rts
+
+found{CBM-@}slot
+         pla
+         clc
+         .bend
+         rts
+
+pr{CBM-@}dodfield
+         .block
+         lda #1 ;match on empty
+         jsr find{CBM-@}slot
+         bcs end
+
+         ;store label
          ldy #0
          lda labelbuf
          sta (ptr2),y
          iny
          lda labelbuf+1
          sta (ptr2),y
+
+         ;set ptr to start of value
          ldy ystore
          tya
-
          clc
          adc ptr
          sta ptr
@@ -467,23 +510,7 @@ eloop
          #sl{CBM-@}inc{CBM-@}y
          cmp #c{CBM-@}end
          bne eloop
-
-         ;store ptr in slot
-         tya
-
-         clc
-         adc ptr
-         sta ptr
-         ldy #4
-         sta (ptr2),y
-         lda #0
-         adc ptr+1
-         sta ptr+1
-         ldy #5
-         sta (ptr2),y
-         ldy #0
          sty ystore
-
 end
          clc
          rts
@@ -492,6 +519,30 @@ end
 pr{CBM-@}dofield
          .block
 
+         lda #0 ;don't match on empty
+         jsr find{CBM-@}slot
+         bcs end
+
+         lda ystore
+         adc ptr
+         sta fldstack
+         lda #0
+         adc ptr+1
+         sta fldstack+1
+
+         inc sl{CBM-@}infld
+         ldy #2
+         lda (ptr2),y
+         sta sl{CBM-@}seglo
+         sta ptr
+         iny
+         lda (ptr2),y
+         sta sl{CBM-@}seghi
+         sta ptr+1
+
+         ldy #0
+
+end
          clc
          rts
          .bend
@@ -562,20 +613,18 @@ docmd
 noslide
          cmp #c{CBM-@}end
          bne noend
+         lda sl{CBM-@}infld
+         beq notinfld
 
-         lda sl{CBM-@}cur
-         sta sl{CBM-@}max
-         clc
-         tya
-         adc ptr
+         ; return from field
+         lda fldstack+1
+         sta sl{CBM-@}seghi
+         lda fldstack
          sta sl{CBM-@}seglo
          lda #0
-         adc ptr+1
-         sta sl{CBM-@}seghi
-         lda #s{CBM-@}paused
-         sta pr{CBM-@}state
-         clc
-         rts
+         dec sl{CBM-@}infld
+         jmp pr{CBM-@}render
+
 noend
          cmp #c{CBM-@}pause
          bne nopause
@@ -598,6 +647,22 @@ nopause
          jsr pr{CBM-@}docmd
          bcs end
          jmp loop
+
+notinfld
+         lda sl{CBM-@}cur
+         sta sl{CBM-@}max
+         clc
+         tya
+         adc ptr
+         sta sl{CBM-@}seglo
+         lda #0
+         adc ptr+1
+         sta sl{CBM-@}seghi
+         lda #s{CBM-@}paused
+         sta pr{CBM-@}state
+         clc
+         rts
+
          .bend
 
 pr{CBM-@}start

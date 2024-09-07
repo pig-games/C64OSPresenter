@@ -48,8 +48,7 @@ sl{CBM-@}col   .byte 0
 sl{CBM-@}row   .byte 0
 sl{CBM-@}seglo .byte 0
 sl{CBM-@}seghi .byte 0
-sl{CBM-@}felo  .byte 0
-sl{CBM-@}fehi  .byte 0
+sl{CBM-@}infld .byte 0
 
 bk{CBM-@}fcol  .byte 0
 bk{CBM-@}bgcol .byte 0
