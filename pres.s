@@ -45,9 +45,14 @@ pr{CBM-@}free  ;Free open pres mem
          ldx pr{CBM-@}bufsz
          jsr pgfree
 
-         ;Free fields
+         ;Free sl ptrs
          ldx #1
          ldy pr{CBM-@}fdpg
+         jsr pgfree
+
+         ;Free fields
+         ldx #1
+         ldy sl{CBM-@}ptrpg
          jsr pgfree
 
          lda #0
@@ -55,6 +60,7 @@ pr{CBM-@}free  ;Free open pres mem
          sta pr{CBM-@}bufpg
          sta pr{CBM-@}bufsz
          sta pr{CBM-@}fdpg
+         sta sl{CBM-@}ptrpg
 done
          rts
          .bend
@@ -72,6 +78,14 @@ pr{CBM-@}init  ;Initialise presentation
          stx pr{CBM-@}state
          stx ystore
          stx sl{CBM-@}infld
+         stx fldstack
+         stx fldstack+1
+         stx fldstack+2
+         stx fldstack+3
+         stx fldstack+4
+         stx fldstack+5
+         stx fldstack+6
+         stx fldstack+7
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
          sta sl{CBM-@}max
@@ -131,6 +145,22 @@ raddr    .word $00 ;inline args
 rsize    .word $00
 
          jsr fclose
+
+         ;allocate sl ptr buffer
+         lda #mapapp
+         ldx #1
+         jsr pgalloc
+         sty sl{CBM-@}ptrpg
+         ;clear non zero bytes 0 to 2
+         ldx #0
+         #stxy ptr
+         ldy #0
+         lda #0
+         sta (ptr),y
+         iny
+         sta (ptr),y
+         iny
+         sta (ptr),y
 
          ;allocate field buffer
          lda #mapapp
@@ -399,9 +429,6 @@ end
          rts
          .bend
 
-labelbuf .word 0
-fldstack .word 0,0,0,0,0,0,0,0
-
 find{CBM-@}slot
          .block
          pha ;store match on empty
@@ -522,15 +549,30 @@ pr{CBM-@}dofield
          lda #0 ;don't match on empty
          jsr find{CBM-@}slot
          bcs end
+         ;backup ptr
+         lda ptr+1
+         pha
+         lda ptr
+         pha
 
-         lda ystore
-         adc ptr
-         sta fldstack
-         lda #0
-         adc ptr+1
-         sta fldstack+1
+         lda #<fldstack
+         sta ptr
+         lda #>fldstack
+         sta ptr+1
 
-         inc sl{CBM-@}infld
+         ldy sl{CBM-@}infld
+
+         pla ;restore lo stack ptr
+         adc ystore
+         sta (ptr),y
+         pla ;restore hi stack ptr
+         adc #0
+         iny
+         sta (ptr),y
+
+         iny
+         sty sl{CBM-@}infld
+
          ldy #2
          lda (ptr2),y
          sta sl{CBM-@}seglo
@@ -613,16 +655,23 @@ docmd
 noslide
          cmp #c{CBM-@}end
          bne noend
-         lda sl{CBM-@}infld
+         ldy sl{CBM-@}infld
          beq notinfld
 
          ; return from field
-         lda fldstack+1
+         lda #<fldstack
+         sta ptr
+         lda #>fldstack
+         sta ptr+1
+
+         dey
+         lda (ptr),y
          sta sl{CBM-@}seghi
-         lda fldstack
+         dey
+         lda (ptr),y
          sta sl{CBM-@}seglo
          lda #0
-         dec sl{CBM-@}infld
+         sty sl{CBM-@}infld
          jmp pr{CBM-@}render
 
 noend

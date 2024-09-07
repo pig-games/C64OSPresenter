@@ -18,12 +18,7 @@ init
          jsr pgalloc
          sty drawctx+d{CBM-@}origin+1
 
-         lda #mapapp
-         ldx #1
-         jsr pgalloc
-         sty sl{CBM-@}ptrpg
-
-         lda #mapapp
+         lda #mpapp
          ldx #8
          jsr pgalloc
          sty chrsbkpg
