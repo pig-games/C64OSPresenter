@@ -14,7 +14,7 @@ The bulk of a presentation file consists of standard petsii text.
 At the start of a presentation it is allowed to include a text segment that provides comments about the presentation. This can be any text of any lenght. This segment is closed by the first __!s__\<CR\> command. This must be the first command of each presentation file.
 
 ## Fields
-The presenter app supports 'fields' that can be used to add short (max 40 character) reusable text fragments that can be added anywhere in the content of a slide with the __!Fff__ command described in the chapter [[#Slides]].
+The presenter app supports 'fields' that can be used to add reusable text fragments that can be added anywhere in the content of a slide with the __!Fff__ command described in the chapter [[#Slides]].
 
 There are three types of fields:
 1. User defined fields
