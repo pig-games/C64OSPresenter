@@ -60,6 +60,9 @@ ptr2     = $fd;$fe
 
 slidecmd .byte 0
 
+labelbuf .word 0
+fldstack .word 0,0,0,0,0,0,0,0
+
 ystore   .byte 0
 dirty    .byte 1
 

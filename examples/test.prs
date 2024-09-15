@@ -4,7 +4,7 @@ This a test presentation
 
 {CBM-@}{CBM-P}{CBM-O}{CBM-I}!c00t!c03e!c04s!c05t !c14presentation{CBM-I}{CBM-O}{CBM-P}{CBM-@}
 !c03* bullet1!p!b03
-!t05!c07* bullet2
+!i05!c07* bullet2
 !s
 !b14slide2
 bla bla
@@ -17,5 +17,5 @@ Third
 !l0024Footer
 !w0410box
 box
-!t00back
+!i00back
 !e

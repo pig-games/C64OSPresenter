@@ -17,10 +17,11 @@ c{CBM-@}dfield = "d" ;Define field
 c{CBM-@}field  = "f" ;Insert field value
 c{CBM-@}loc    = "l" ;Change location
 c{CBM-@}window = "w" ;Change window
-c{CBM-@}sttab  = "t" ;Set tab (indent)
+c{CBM-@}sttab  = "i" ;Set indent
 c{CBM-@}clend  = "{CBM-@}" ;Clear to line end
 c{CBM-@}color  = "c" ;Set color
 c{CBM-@}backgr = "b" ;Set background color
+c{CBM-@}inctmp = "#" ;Include template
 c{CBM-@}end    = "e" ;End
 
 s{CBM-@}ended  = 0
@@ -69,9 +70,10 @@ pr{CBM-@}init  ;Initialise presentation
          .block
 
          ldx #0
-         ldy pr{CBM-@}bufpg
          stx sl{CBM-@}seglo
+         ldy pr{CBM-@}bufpg
          sty sl{CBM-@}seghi
+
          stx sl{CBM-@}row
          stx sl{CBM-@}curcol
          stx sl{CBM-@}col
@@ -92,15 +94,18 @@ pr{CBM-@}init  ;Initialise presentation
          lda #1
          sta sl{CBM-@}haspause
 
-         tya      ;A = pr{CBM-@}bufpg
-         ldy sl{CBM-@}ptrpg
-         #stxy ptr
-         ldy #$80 ;hi pages
-         sta (ptr),y
-         lda #0
-         ldy #0   ;lo pages
-         sta (ptr),y
+         rts
+         .bend
 
+cleanpg
+         .block
+         ldy #0
+         lda #0
+         sta (ptr),y
+         iny
+         sta (ptr),y
+         iny
+         sta (ptr),y
          rts
          .bend
 
@@ -154,13 +159,7 @@ rsize    .word $00
          ;clear non zero bytes 0 to 2
          ldx #0
          #stxy ptr
-         ldy #0
-         lda #0
-         sta (ptr),y
-         iny
-         sta (ptr),y
-         iny
-         sta (ptr),y
+         jsr cleanpg
 
          ;allocate field buffer
          lda #mapapp
@@ -170,13 +169,7 @@ rsize    .word $00
          ;clear non zero bytes 0 to 2
          ldx #0
          #stxy ptr
-         ldy #0
-         lda #0
-         sta (ptr),y
-         iny
-         sta (ptr),y
-         iny
-         sta (ptr),y
+         jsr cleanpg
 
          ;trigger pres redraw
 
@@ -738,9 +731,10 @@ loop
          lda (ptr),y
          beq end
          cmp #c{CBM-@}cmd
-         bne next
-
-         ;get command code
+         beq cmd
+         #sl{CBM-@}inc{CBM-@}y
+         jmp loop
+cmd      ;get command code
          #sl{CBM-@}inc{CBM-@}y
 
          lda (ptr),y
@@ -761,6 +755,17 @@ loop
          adc ptr+1
          sta sl{CBM-@}seghi
 
+         ldx #0
+         ldy sl{CBM-@}ptrpg
+         #stxy ptr
+
+         ldy #$80 ;hi pages
+
+         sta (ptr),y
+         lda sl{CBM-@}seglo
+         ldy #0   ;lo pages
+         sta (ptr),y
+
          ldy #$d8
          jsr setchrs
 
@@ -769,12 +774,6 @@ loop
 
          clc ;Msg Handled
          rts
-
-next     iny
-         bne loop
-         inc ptr+1
-         bne loop
-
 end
          jmp pr{CBM-@}end
 
