@@ -28,6 +28,10 @@ s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
 s{CBM-@}render = 2
 
+f{CBM-@}pv     .text "pv0.6.0!e"
+f{CBM-@}pd     .text "pddd-mm-yyyy!e"
+f{CBM-@}pn     .text "pn{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
+f{CBM-@}sn     .text "sn0!e  "
 
 pr{CBM-@}free  ;Free open pres mem
          .block
@@ -171,6 +175,20 @@ rsize    .word $00
          #stxy ptr
          jsr cleanpg
 
+         ;set pv field
+
+         ldx #<f{CBM-@}pv
+         ldy #>f{CBM-@}pv
+         #stxy ptr
+         ldy #0
+         jsr pr{CBM-@}dodfield
+
+         ldx #<f{CBM-@}sn
+         ldy #>f{CBM-@}sn
+         #stxy ptr
+         ldy #0
+         jsr pr{CBM-@}dodfield
+
          ;trigger pres redraw
 
          jsr pr{CBM-@}init
@@ -256,7 +274,7 @@ pr{CBM-@}doslide
          tay
          lda (ptr),y
          sta sl{CBM-@}seglo
-         jmp setslptr
+         jmp rstdptr
 
 noslptr
          lda sl{CBM-@}seghi
@@ -267,7 +285,7 @@ noslptr
          lda sl{CBM-@}seglo
          sta (ptr),y
 
-setslptr
+rstdptr
          ; restore slide data ptr
          ldx sl{CBM-@}seglo
          ldy sl{CBM-@}seghi
@@ -277,12 +295,30 @@ setslptr
          ; consume CR after !s
          ; actually works with any char
          #sl{CBM-@}inc{CBM-@}y
-
+         lda ptr+1
+         sta sl{CBM-@}seghi
          .bend
+         ;fallthrough
 
 pr{CBM-@}strtsl
          .block
          sty ystore
+
+         lda sl{CBM-@}cur
+         clc
+         adc #48
+
+         ldx #<f{CBM-@}sn
+         ldy #>f{CBM-@}sn
+         #stxy ptr
+         ldy #2
+         sta (ptr),y
+         iny
+         lda #"!"
+         sta (ptr),y
+         iny
+         lda #"e"
+         sta (ptr),y
 
          ldx #0
          stx sl{CBM-@}row
@@ -300,7 +336,11 @@ pr{CBM-@}strtsl
          ;Clear the Draw Context
          lda #" "
          jsr ctxclear
-end
+
+         ; restore slide data ptr
+         ldx sl{CBM-@}seglo
+         ldy sl{CBM-@}seghi
+         #stxy ptr
          ldy ystore
 
          clc
@@ -755,16 +795,16 @@ cmd      ;get command code
          adc ptr+1
          sta sl{CBM-@}seghi
 
-         ldx #0
-         ldy sl{CBM-@}ptrpg
-         #stxy ptr
+         ;ldx #0
+         ;ldy sl{CBM-@}ptrpg
+         ;#stxy ptr
 
-         ldy #$80 ;hi pages
+         ;ldy #$80 ;hi pages
 
-         sta (ptr),y
-         lda sl{CBM-@}seglo
-         ldy #0   ;lo pages
-         sta (ptr),y
+         ;sta (ptr),y
+         ;lda sl{CBM-@}seglo
+         ;ldy #0   ;lo pages
+         ;sta (ptr),y
 
          ldy #$d8
          jsr setchrs
@@ -790,6 +830,7 @@ pr{CBM-@}nextsl
          cmp sl{CBM-@}max
          bcs end
 
+         ;inc sl{CBM-@}cur
          lda #s{CBM-@}render
          sta pr{CBM-@}state
 
