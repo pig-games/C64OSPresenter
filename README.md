@@ -40,9 +40,9 @@ These fields are always available and don't need any definition. Do note that th
 
 The following dynamic (automatic) fields are defined:
 - **PV**: Presenter (application) Version, set at the start of the presentation. 
-- __PD__: Presentation date, which is the current date when the presentation is started.
-* **PN**: Presentation file name at the time of loading the presentation.
-- **SN**: Number of the current slide starting at 1, increased when progressing to the next slide, decreased when returning to the previous slide.
+- __PD__: Presentation Date, which is the current date when the presentation is started.
+* **PF**: Presentation File name at the time of loading the presentation.
+- **SN**: Current Slide Number starting at 1, increased when progressing to the next slide, decreased when returning to the previous slide.
 
 ## Slides
 The bulk of a slide's content consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
