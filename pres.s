@@ -30,7 +30,7 @@ s{CBM-@}render = 2
 
 f{CBM-@}pv     .text "pv0.6.0!e"
 f{CBM-@}pd     .text "pddd-mm-yyyy!e"
-f{CBM-@}pn     .text "pn{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
+f{CBM-@}pf     .text "pf{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
 f{CBM-@}sn     .text "sn0!e  "
 
 pr{CBM-@}free  ;Free open pres mem
@@ -82,6 +82,7 @@ pr{CBM-@}init  ;Initialise presentation
          stx sl{CBM-@}curcol
          stx sl{CBM-@}col
          stx pr{CBM-@}state
+         stx slidecmd
          stx ystore
          stx sl{CBM-@}infld
          stx fldstack
@@ -146,6 +147,31 @@ pr{CBM-@}load  ;Load presentation
          sty pr{CBM-@}bufpg
          sty raddr+1
 
+         ;set pf field with fname
+         ldx #<f{CBM-@}pf
+         ldy #>f{CBM-@}pf
+         #stxy ptr2
+         inc ptr2
+         inc ptr2
+
+         lda #frefname
+         clc
+         adc ptr
+         sta ptr
+         ldy #0
+loop
+         lda (ptr),y
+         beq end
+         sta (ptr2),y
+         iny
+         jmp loop
+end
+         lda #"!"
+         sta (ptr2),y
+         iny
+         lda #"e"
+         sta (ptr2),y
+
          ;read file
 
          #rdxy opnfileref
@@ -168,7 +194,7 @@ rsize    .word $00
          ;allocate field buffer
          lda #mapapp
          ldx #1
-         jsr pgalloc
+         jsr pgalloc ;todo: clnalloc
          sty pr{CBM-@}fdpg
          ;clear non zero bytes 0 to 2
          ldx #0
@@ -183,8 +209,18 @@ rsize    .word $00
          ldy #0
          jsr pr{CBM-@}dodfield
 
+         ;set sn field
+
          ldx #<f{CBM-@}sn
          ldy #>f{CBM-@}sn
+         #stxy ptr
+         ldy #0
+         jsr pr{CBM-@}dodfield
+
+         ;set pf field
+
+         ldx #<f{CBM-@}pf
+         ldy #>f{CBM-@}pf
          #stxy ptr
          ldy #0
          jsr pr{CBM-@}dodfield
@@ -274,7 +310,7 @@ pr{CBM-@}doslide
          tay
          lda (ptr),y
          sta sl{CBM-@}seglo
-         jmp rstdptr
+         jmp setslptr
 
 noslptr
          lda sl{CBM-@}seghi
@@ -285,18 +321,14 @@ noslptr
          lda sl{CBM-@}seglo
          sta (ptr),y
 
-rstdptr
+setslptr
          ; restore slide data ptr
-         ldx sl{CBM-@}seglo
-         ldy sl{CBM-@}seghi
-         #stxy ptr
          ldy ystore
 
          ; consume CR after !s
-         ; actually works with any char
+         ; actually works with any chr
          #sl{CBM-@}inc{CBM-@}y
-         lda ptr+1
-         sta sl{CBM-@}seghi
+
          .bend
          ;fallthrough
 
@@ -304,21 +336,47 @@ pr{CBM-@}strtsl
          .block
          sty ystore
 
-         lda sl{CBM-@}cur
-         clc
-         adc #48
+         ;set sl field to slide num
+
+         #ldxy 10
+         #stxy divisor
+         ldx sl{CBM-@}cur
+         ldy #0
+         inx
+         #stxy dividnd
+         jsr tostr
+         #stxy ptr2
 
          ldx #<f{CBM-@}sn
          ldy #>f{CBM-@}sn
          #stxy ptr
-         ldy #2
+         inc ptr
+         inc ptr
+         ldy #0
+loop
+         lda (ptr2),y
+         beq end
          sta (ptr),y
          iny
+         jmp loop
+end
          lda #"!"
          sta (ptr),y
          iny
          lda #"e"
          sta (ptr),y
+
+         ; restore slide data ptr
+         ldx sl{CBM-@}seglo
+         ldy sl{CBM-@}seghi
+         #stxy ptr
+
+         ldy ystore
+         ; consume CR after !s
+         ; actually works with any chr
+         #sl{CBM-@}inc{CBM-@}y
+
+         ;start slide
 
          ldx #0
          stx sl{CBM-@}row
@@ -337,10 +395,6 @@ pr{CBM-@}strtsl
          lda #" "
          jsr ctxclear
 
-         ; restore slide data ptr
-         ldx sl{CBM-@}seglo
-         ldy sl{CBM-@}seghi
-         #stxy ptr
          ldy ystore
 
          clc
@@ -672,22 +726,27 @@ end
 
 docmd
          ; get command code
-         #sl{CBM-@}inc{CBM-@}y
+         #sl{CBM-@}inc{CBM-@}y    ;eat !
 
-         lda (ptr),y
+         lda (ptr),y  ;read cmd
          beq end
 
-         cmp #"!"
-         beq printchr
+         cmp #"!"     ;second !
+         beq printchr ;output !
 
          cmp #c{CBM-@}slide
          bne noslide
 
-         sta pr{CBM-@}cmd
-         beq pause
+         ;pause and wait for trigger
+
+         sta pr{CBM-@}cmd ;set to c{CBM-@}slide
+         beq pause  ;wait for trigger
 noslide
          cmp #c{CBM-@}end
          bne noend
+
+         ;we found !e, prs or field?
+
          ldy sl{CBM-@}infld
          beq notinfld
 
@@ -708,16 +767,16 @@ noslide
          jmp pr{CBM-@}render
 
 noend
-         cmp #c{CBM-@}pause
+         cmp #c{CBM-@}pause ;test for !p
          bne nopause
+         #sl{CBM-@}inc{CBM-@}y    ;eat p
 
-         #sl{CBM-@}inc{CBM-@}y
 pause
          dec sl{CBM-@}haspause
          lda #s{CBM-@}paused
          sta pr{CBM-@}state
-         clc
-         tya
+         clc          ;set new seg ptr
+         tya          ;at ptr + y
          adc ptr
          sta sl{CBM-@}seglo
          lda #0
@@ -762,7 +821,9 @@ ended    ;state is ended so we can start
          jsr setflags
 
          jsr pr{CBM-@}init
-         ;skip chars up to first !s
+
+         ;skip chars upto first !s or !d
+
          ldx sl{CBM-@}seglo
          ldy sl{CBM-@}seghi
          #stxy ptr
@@ -781,7 +842,17 @@ cmd      ;get command code
          beq end
 
          cmp #c{CBM-@}slide
+         beq doslide
+
+         cmp #c{CBM-@}dfield
          bne end
+         ;process dfield
+         #sl{CBM-@}inc{CBM-@}y ;eat d
+         jsr pr{CBM-@}dodfield
+         bcs end
+         jmp loop
+
+doslide
          sta pr{CBM-@}cmd
 
          lda #s{CBM-@}render
@@ -795,16 +866,16 @@ cmd      ;get command code
          adc ptr+1
          sta sl{CBM-@}seghi
 
-         ;ldx #0
-         ;ldy sl{CBM-@}ptrpg
-         ;#stxy ptr
+         ldx #0
+         ldy sl{CBM-@}ptrpg
+         #stxy ptr
 
-         ;ldy #$80 ;hi pages
+         ldy #$80 ;hi pages
 
-         ;sta (ptr),y
-         ;lda sl{CBM-@}seglo
-         ;ldy #0   ;lo pages
-         ;sta (ptr),y
+         sta (ptr),y
+         lda sl{CBM-@}seglo
+         ldy #0   ;lo pages
+         sta (ptr),y
 
          ldy #$d8
          jsr setchrs
@@ -816,12 +887,10 @@ cmd      ;get command code
          rts
 end
          jmp pr{CBM-@}end
-
          .bend
 
 pr{CBM-@}nextsl
          ;Process next slide in pres
-         ;slidecmd -> current command
          .block
          lda pr{CBM-@}state
          beq end
@@ -830,7 +899,6 @@ pr{CBM-@}nextsl
          cmp sl{CBM-@}max
          bcs end
 
-         ;inc sl{CBM-@}cur
          lda #s{CBM-@}render
          sta pr{CBM-@}state
 

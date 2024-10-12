@@ -63,5 +63,8 @@ setctx   #syscall ltkt,setctx{CBM-@}
          #inc{CBM-@}h "string"
 tolower  #syscall lstr,tolower{CBM-@}
 
+         #inc{CBM-@}h "math"
+tostr    #syscall lmat,tostr{CBM-@}
+
          .byte $ff ;terminator
 
