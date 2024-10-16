@@ -21,7 +21,7 @@ c{CBM-@}sttab  = "i" ;Set indent
 c{CBM-@}clend  = "{CBM-@}" ;Clear to line end
 c{CBM-@}color  = "c" ;Set color
 c{CBM-@}backgr = "b" ;Set background color
-c{CBM-@}inctmp = "#" ;Include template
+c{CBM-@}inctpl = "#" ;Include template
 c{CBM-@}end    = "e" ;End
 
 s{CBM-@}ended  = 0
@@ -73,11 +73,12 @@ done
 pr{CBM-@}init  ;Initialise presentation
          .block
 
-         ldx #0
+         ldx pr{CBM-@}prslo
          stx sl{CBM-@}seglo
-         ldy pr{CBM-@}bufpg
+         ldy pr{CBM-@}prshi
          sty sl{CBM-@}seghi
 
+         ldx #0
          stx sl{CBM-@}row
          stx sl{CBM-@}curcol
          stx sl{CBM-@}col
@@ -225,9 +226,19 @@ rsize    .word $00
          ldy #0
          jsr pr{CBM-@}dodfield
 
-         ;trigger pres redraw
+         ldx #0
+         stx pr{CBM-@}prslo
+         ldy pr{CBM-@}bufpg
+         sty pr{CBM-@}prshi
 
          jsr pr{CBM-@}init
+
+         ldx #0
+         ldy pr{CBM-@}bufpg
+         jsr pr{CBM-@}incltpl
+
+         ;trigger pres redraw
+
          #pr{CBM-@}st{CBM-@}dirty
          #ui{CBM-@}mkredraw
 
@@ -284,6 +295,88 @@ pr{CBM-@}docmd
          .rta pr{CBM-@}dofield
 
          sec
+         rts
+         .bend
+
+pr{CBM-@}incltpl
+         .block
+         #stxy ptr
+         ;check for include
+         ldy #0
+         lda (ptr),y
+         cmp #c{CBM-@}cmd
+         bne end
+         iny
+         lda (ptr),y
+         cmp #c{CBM-@}inctpl
+         bne end
+         clc
+         lda #2
+         adc ptr
+         sta ptr
+         ;change closing cr to 0
+         ldy #0
+loop
+         lda (ptr),y
+         beq end
+         #sl{CBM-@}inc{CBM-@}y
+         cmp #cr
+         bne loop
+
+         lda #0
+         dey ;set
+         sta (ptr),y ;replace cr with 0
+
+         ;set start of prs data
+         lda ptr+1
+         sta pr{CBM-@}prshi
+         sta sl{CBM-@}seghi
+         iny
+         iny
+         iny
+         sty pr{CBM-@}prslo
+         sty sl{CBM-@}seglo
+
+         ;get file ref
+
+         clc
+         #rdxy ptr
+         jsr frefcvt
+         #stxy ptr2
+
+         lda #ff{CBM-@}r.ff{CBM-@}s
+         jsr fopen
+
+         ;reserve mem for file
+
+         ldy #frefblks ;lo byte only
+         lda (ptr2),y
+         sta pr{CBM-@}tplsz
+         sta rsize+1
+
+         tax
+         lda #mapapp
+         jsr pgalloc
+
+         sty pr{CBM-@}tplpg
+         sty raddr+1
+
+         #rdxy ptr2
+         jsr fread
+raddr    .word $00 ;inline args
+rsize    .word $00
+
+         jsr fclose
+
+         ldx #0
+         ldy pr{CBM-@}tplpg
+         jsr doheader
+         bcc end
+;err
+         ;sec
+         ;rts
+end
+         clc
          rts
          .bend
 
@@ -806,6 +899,43 @@ notinfld
 
          .bend
 
+doheader
+         .block
+         #stxy ptr
+         ldy #0
+loop
+         lda (ptr),y
+         beq end
+         cmp #c{CBM-@}cmd
+         beq cmd
+         #sl{CBM-@}inc{CBM-@}y
+         jmp loop
+cmd      ;get command code
+         #sl{CBM-@}inc{CBM-@}y
+
+         lda (ptr),y
+         beq end
+
+         cmp #c{CBM-@}slide
+         beq end
+         cmp #c{CBM-@}end
+         beq end
+
+         cmp #c{CBM-@}dfield
+         bne err
+         ;process dfield
+         #sl{CBM-@}inc{CBM-@}y ;eat d
+         jsr pr{CBM-@}dodfield
+         bcs end
+         jmp loop
+end
+         clc
+         rts
+err
+         sec
+         rts
+         .bend
+
 pr{CBM-@}start
          .block
          lda pr{CBM-@}state
@@ -826,32 +956,8 @@ ended    ;state is ended so we can start
 
          ldx sl{CBM-@}seglo
          ldy sl{CBM-@}seghi
-         #stxy ptr
-         ldy #0
-loop
-         lda (ptr),y
-         beq end
-         cmp #c{CBM-@}cmd
-         beq cmd
-         #sl{CBM-@}inc{CBM-@}y
-         jmp loop
-cmd      ;get command code
-         #sl{CBM-@}inc{CBM-@}y
-
-         lda (ptr),y
-         beq end
-
-         cmp #c{CBM-@}slide
-         beq doslide
-
-         cmp #c{CBM-@}dfield
-         bne end
-         ;process dfield
-         #sl{CBM-@}inc{CBM-@}y ;eat d
-         jsr pr{CBM-@}dodfield
+         jsr doheader
          bcs end
-         jmp loop
-
 doslide
          sta pr{CBM-@}cmd
 

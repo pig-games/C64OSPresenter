@@ -31,9 +31,13 @@ chrsbkpg .byte 0
 
 pr{CBM-@}bufpg .byte 0
 pr{CBM-@}bufsz .byte 0 ;size in pages
+pr{CBM-@}prslo .byte 0
+pr{CBM-@}prshi .byte 0
 pr{CBM-@}state .byte 0
 pr{CBM-@}cmd   .byte 0
 pr{CBM-@}fdpg  .byte 0 ;field defs
+pr{CBM-@}tplpg .byte 0 ;buf for template file
+pr{CBM-@}tplsz .byte 0
 
 sl{CBM-@}cur   .byte 0
 sl{CBM-@}max   .byte 0
