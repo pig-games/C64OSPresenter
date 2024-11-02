@@ -28,8 +28,8 @@ s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
 s{CBM-@}render = 2
 
-f{CBM-@}pv     .text "pv0.6.0!e"
-f{CBM-@}pd     .text "pddd-mm-yyyy!e"
+f{CBM-@}pv     .text "pv0.8.1!e"
+f{CBM-@}pd     .text "pdyyyy-mm-dd!e"
 f{CBM-@}pf     .text "pf{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
 f{CBM-@}sn     .text "sn0!e  "
 
@@ -226,6 +226,14 @@ rsize    .word $00
          ldy #0
          jsr pr{CBM-@}dodfield
 
+         ;set pd field
+
+         ;ldx #<f{CBM-@}pd
+         ;ldy #>f{CBM-@}pd
+         ;#stxy ptr
+         ;ldy #0
+         ;jsr pr{CBM-@}dodfield
+
          ldx #0
          stx pr{CBM-@}prslo
          ldy pr{CBM-@}bufpg
@@ -373,8 +381,8 @@ rsize    .word $00
          jsr doheader
          bcc end
 ;err
-         ;sec
-         ;rts
+         sec
+         rts
 end
          clc
          rts
@@ -773,6 +781,8 @@ pr{CBM-@}render ;render a segment of content
          ;renders up to the next 'break'
          .block
 
+         jsr hidemouse
+
          ldx sl{CBM-@}seglo
          ldy sl{CBM-@}seghi
          #stxy ptr
@@ -945,6 +955,35 @@ pr{CBM-@}start
          rts
 
 ended    ;state is ended so we can start
+         ; set currrent date in pd fld
+
+         ;ldy d{CBM-@}year
+         ;ldx d{CBM-@}month
+         ;lda d{CBM-@}day
+         ;jsr toisodt{CBM-@}
+
+         ;#stxy ptr2
+
+         ;ldx #<f{CBM-@}pd
+         ;ldy #>f{CBM-@}pd
+         ;#stxy ptr
+         ;inc ptr
+         ;inc ptr
+         ;ldy #0
+;loop
+         ;lda (ptr2),y
+         ;beq dcend
+         ;sta (ptr),y
+         ;iny
+         ;jmp loop
+;dcend
+         ;lda #"!"
+         ;sta (ptr),y
+         ;iny
+         ;lda #"e"
+         ;sta (ptr),y
+
+         ;do actual start slide
 
          lda redrawflgs
          and #(rmenubar.rstatbar):$ff

@@ -20,6 +20,7 @@
          #inc{CBM-@}s "file"
          #inc{CBM-@}s "openjobs"
          #inc{CBM-@}s "string"
+         #inc{CBM-@}s "input"
 
          *= appbase
 
@@ -44,6 +45,7 @@ ctx2scr  #syscall lscr,ctx2scr{CBM-@}
 fopen    #syscall lfil,fopen{CBM-@}
 fread    #syscall lfil,fread{CBM-@}
 fclose   #syscall lfil,fclose{CBM-@}
+frefcvt  #syscall lfil,frefcvt{CBM-@}
 
          #inc{CBM-@}h "memory"
 pgalloc  #syscall lmem,pgalloc{CBM-@}
@@ -65,6 +67,9 @@ tolower  #syscall lstr,tolower{CBM-@}
 
          #inc{CBM-@}h "math"
 tostr    #syscall lmat,tostr{CBM-@}
+
+         #inc{CBM-@}h "input"
+hidemouse #syscall linp,hidemouse{CBM-@}
 
          .byte $ff ;terminator
 

@@ -1,10 +1,16 @@
-!#11:1:tpltest.prs://documents/
+!#11:1:demotemplate.prs://documents/
 123456
-!dtfField!e  
 !s
-!fsn:!ftf:!ft1
-!ft2
-!difInnerField !fpv!e!dofOuter-!fif-Field!e!fof
+!dptTemplate test!e
+!dpsSub title!e
+!fts  
 !s
-!fsn !fpf
+!dtiIncluded template test!e
+!dsbThis presentation uses
+a template file!e
+!fb1
+!s
+!dtiSecond slide!e
+!dsbSecond body!e
+!fb1
 !e

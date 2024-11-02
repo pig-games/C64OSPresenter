@@ -1,0 +1,53 @@
+Slide template
+
+*pt: Presentation title
+
+!dptPresentation title!e
+
+*ps: Presentation sub title
+
+!dpsSub title!e
+
+*ts: Title slide
+
+!dts!c01!b14!l0406!fpt!c03!l0608!fps!e
+
+*ti: slide title, overwrite with title
+
+!dtiTitle!e
+
+*sb: Slide body content, overwrite with body
+
+!dsbBody!e
+
+*sh: slide header
+
+!dsh!c06!l0200!fti!{CBM-@}!c00
+ {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+!e
+
+*sf: Slide footer
+
+!dsf!c00!l0123{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+!i02!c062024109 !fpf!i37!fsn!e
+
+*s1: Slide template 1
+
+!db1!b01!c00!fsh
+!fsf
+!w0204!fsb!e
+
+***** Template preview *****
+!s
+!dtiTemplate preview!e
+!dsbThis is an example slide
+
+* Bullet1!p
+* Bullet2
+!e
+!fb1
+!s
+!dtiSlide 2!e
+!dsbThis is slide two content!e
+!fb1
+!e
