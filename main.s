@@ -1,4 +1,4 @@
-;----[main.a - presenter ]--------------
+;----[ main.a - presenter ]-------------
 
          .include "/h/:macros.h"
          .include "//os/h/:modules.h"
@@ -11,6 +11,7 @@
          #inc{CBM-@}s "pointer"
          #inc{CBM-@}s "switch"
          #inc{CBM-@}s "math"
+         #inc{CBM-@}s "io{CBM-@}joy"
 
          ;Kernal Module Constants
 
@@ -21,6 +22,7 @@
          #inc{CBM-@}s "openjobs"
          #inc{CBM-@}s "string"
          #inc{CBM-@}s "input"
+         #inc{CBM-@}s "timers"
 
          *= appbase
 
@@ -32,44 +34,49 @@
 
 externs  ;Kernal Link Table
 
-         #inc{CBM-@}h "screen"
-markredraw #syscall lscr,markredraw{CBM-@}
-layerpush #syscall lscr,layerpush{CBM-@}
-setlrc   #syscall lscr,setlrc{CBM-@}
-setdprops #syscall lscr,setdprops{CBM-@}
-ctxclear #syscall lscr,ctxclear{CBM-@}
-ctxdraw  #syscall lscr,ctxdraw{CBM-@}
-ctx2scr  #syscall lscr,ctx2scr{CBM-@}
+         ;#inc{CBM-@}h "screen"
+markredraw #syscall $f6,$03
+layerpush #syscall $f6,$06
+setlrc   #syscall $f6,$0c
+setdprops #syscall $f6,$0f
+ctxclear #syscall $f6,$12
+ctxdraw  #syscall $f6,$15
+ctx2scr  #syscall $f6,$18
 
-         #inc{CBM-@}h "file"
-fopen    #syscall lfil,fopen{CBM-@}
-fread    #syscall lfil,fread{CBM-@}
-fclose   #syscall lfil,fclose{CBM-@}
-frefcvt  #syscall lfil,frefcvt{CBM-@}
+         ;#inc{CBM-@}h "file"
+fopen    #syscall $f0,$06
+fread    #syscall $f0,$09
+fclose   #syscall $f0,$15
+frefcvt  #syscall $f0,$18
 
-         #inc{CBM-@}h "memory"
-pgalloc  #syscall lmem,pgalloc{CBM-@}
-pgfree   #syscall lmem,pgfree{CBM-@}
-memcpy   #syscall lmem,memcpy{CBM-@}
+         ;#inc{CBM-@}h "memory"
+pgalloc  #syscall $fe,$15
+pgfree   #syscall $fe,$0f
+memcpy   #syscall $fe,$00
 
-         #inc{CBM-@}h "service"
-quitapp  #syscall lser,quitapp{CBM-@}
-loadlib  #syscall lser,loadlib{CBM-@}
-unldlib  #syscall lser,unldlib{CBM-@}
-loadutil #syscall lser,loadutil{CBM-@}
-setflags #syscall lser,setflags{CBM-@}
+         ;#inc{CBM-@}h "service"
+quitapp  #syscall $f2,$21
+loadlib  #syscall $f2,$2a
+unldlib  #syscall $f2,$2d
+loadutil #syscall $f2,$1e
+setflags #syscall $f2,$0c
+getsfref #syscall $f2,$15
+loadreloc #syscall $f2,$27
 
-         #inc{CBM-@}h "toolkit"
-setctx   #syscall ltkt,setctx{CBM-@}
+         ;#inc{CBM-@}h "toolkit"
+setctx   #syscall $ee,$06
 
-         #inc{CBM-@}h "string"
-tolower  #syscall lstr,tolower{CBM-@}
+         ;#inc{CBM-@}h "string"
+tolower  #syscall $fa,$0f
 
-         #inc{CBM-@}h "math"
-tostr    #syscall lmat,tostr{CBM-@}
+         ;#inc{CBM-@}h "math"
+tostr    #syscall $f8,$06
 
-         #inc{CBM-@}h "input"
-hidemouse #syscall linp,hidemouse{CBM-@}
+         ;#inc{CBM-@}h "input"
+hidemouse #syscall $fc,$06
+
+         ;#inc{CBM-@}h "timers"
+timeque  #syscall $ec,$00
 
          .byte $ff ;terminator
 

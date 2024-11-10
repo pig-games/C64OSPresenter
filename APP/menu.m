@@ -1,10 +1,12 @@
-File;a
+File;c
 Open:2oo
+*
+Go Home:6h!
 Slides;d
 Start:2ss
 Previous:2pp
 Next:2nn
 End:2ee
-Go;a
-Go Home:6h!
+Controls;a
+Joy 2 driver:2jj
 

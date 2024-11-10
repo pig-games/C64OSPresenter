@@ -7,14 +7,18 @@ The file format is a very simple petscii format that can be created and edited w
 
 # File format
 Presentation files are sequence files that are required to have the '.prs' file extension.
+
 The bulk of a presentation file consists of standard petsii text.
 
-## Comment section
-
-At the start of a presentation it is allowed to include a text segment that provides comments about the presentation. This can be any text of any lenght. This segment is closed by the first __!s__\<CR\> command. This must be the first command of each presentation file.
+# Template files
+It is possible to define 'template' files for use in presentations. Such template files have the same file format as the presentation files and should also use the file extension: '.prs'.
+Templates can be 'included/imported' on the first line of a presentation file. Note that this 'inclusion' must only be one level deep. So a file that is to be used as a template, should itself 'include' another template.
+Including a template is done with the __!#__ command as the first content of the presentation file (first line, starting at the first character). It must be immediately followed by a c64os file reference (and should for now be an absolute path to the template file).
+A template file should mostly contain field definitions (see below). It may include comments (any line not starting with an field definition). It should be ended by an __!e__ command or contain a number of slide definitions (denoted with the __!s__ command) after the field definitions. The slide definitions should be ended with a __!e__ like any regular presentation file.
+These slide definitions can be used as an internal demonstration of the templates defined in the template. This should be used carefully as it adds to the memory consumption of any presentation that includes the template.
 
 ## Fields
-The presenter app supports 'fields' that can be used to add reusable text fragments that can be added anywhere in the content of a slide with the __!Fff__ command described in the chapter [[#Slides]].
+The presenter app supports 'fields' that can be used to add short (max 40 character) reusable text fragments that can be added anywhere in the content of a slide with the __!Fff__ command described in the chapter [[#Slides]].
 
 There are three types of fields:
 1. User defined fields
@@ -29,25 +33,26 @@ It *is* possible to nest the usage of fields inside of fields. Currently the max
 If a field is defined that was already defined earlier in the flow of the presentation (including before stepping back a few slides), it will simply be overwritten. So if you want to make sure you control the value of a field in a specific slide you have to make sure you set it at the start of the slide itself and not rely on it having been set in a previous slide.
 
 The following fields are 'standard' by convention: 
-* __TI__: Title, this field is used to contain the title of the presentation
-* __ST__: Section title, this field is used to contain the title of a section of slides. 
-* __AU__: Author, this is field is used to contain the name of the author of the presentation
-* __CD__: Creation Date, this field is used to contain the creation date of the presentation
+* __ti__: Title, this field is used to contain the title of the presentation
+* __st__: Section title, this field is used to contain the title of a section of slides. 
+* __au__: Author, this is field is used to contain the name of the author of the presentation
+* __cd__: Creation Date, this field is used to contain the creation date of the presentation
 
 One way to allow for one more field is by using either the __TI__ or __ST__ field for both the title of the presentation and the title of a section of slides (if both titles are not used at the same time anywhere).
 ### Dynamic fields (will be available in later version)
 These fields are always available and don't need any definition. Do note that these are really regular fields and are set automatically at specific points during the use of the Presenter. This means that they can be overwritten like any other field, so if you don't want this make sure you don't but it also allows you to reclaim the field names if you don't need the 'automatic' values
 
 The following dynamic (automatic) fields are defined:
-- **PV**: Presenter (application) Version, set at the start of the presentation. 
-- __PD__: Presentation Date, which is the current date when the presentation is started.
-* **PF**: Presentation File name at the time of loading the presentation.
-- **SN**: Current Slide Number starting at 1, increased when progressing to the next slide, decreased when returning to the previous slide.
+- **pv**: Presenter (application) Version, set at the start of the presentation. 
+- __pd__: Presentation date, which is the current date when the presentation is started.
+* **pn**: Presentation file name at the time of loading the presentation.
+- **sn**: Number of the current slide starting at 1, increased when progressing to the next slide, decreased when returning to the previous slide.
 
 ## Slides
 The bulk of a slide's content consists of standard petsii text. In addition to this a set of commands can be used that are always prefixed with an '!' (to have an ! in the output just use !! in the slide content).
 
 The following commands are supported:
+* __!#\<path\>__: Only allowed at the first character of a presentation file (and only one level deep). The path must be an absolute path that specifies the template file that is to be included in the presentation.
 * __!s__\<CR\>: Start of a new slide/section. This command pauses the presentation, and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen. Note that this command needs to end with a CR (carriage return).
 * **!p**\<CR\>: Pause the current slide. This command pauses the presentation and when 'Next' is triggered, will continue any new content at the paused position.
 * **!c**xx: Changes the text color. It requires a two digit decimal number, between 0 and 15, immediately after the command.

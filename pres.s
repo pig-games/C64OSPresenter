@@ -162,7 +162,7 @@ pr{CBM-@}load  ;Load presentation
          ldy #0
 loop
          lda (ptr),y
-         beq end
+         beq end ;*+8
          sta (ptr2),y
          iny
          jmp loop
@@ -456,7 +456,7 @@ pr{CBM-@}strtsl
          ldy #0
 loop
          lda (ptr2),y
-         beq end
+         beq end ;*+8
          sta (ptr),y
          iny
          jmp loop
@@ -545,7 +545,7 @@ pr{CBM-@}dobackgr
 pr{CBM-@}dowindow
          lda #1
          pha
-         bne dowin
+         bne dowin ;*+5
 pr{CBM-@}doloc
          lda #0
          pha
@@ -568,7 +568,7 @@ dowin
          pla ;restore column
          tax
          pla ;get tab switch
-         beq notab
+         beq notab ;*+5
          stx sl{CBM-@}col
 notab
          ldy #0
@@ -606,7 +606,7 @@ pr{CBM-@}doclend
          ldx sl{CBM-@}curcol
 loop
          cpx #39
-         bcs end
+         bcs end ;*+11
          lda #$20
          jsr ctxdraw
          inx
@@ -643,7 +643,7 @@ loop
          ldy #0
          pla ;restore match on empty
          pha
-         beq noempty
+         beq noempty ;*+6
          lda (ptr2),y
          beq found{CBM-@}slot ;so store
 noempty
@@ -838,7 +838,7 @@ docmd
          beq printchr ;output !
 
          cmp #c{CBM-@}slide
-         bne noslide
+         bne noslide ;*+6
 
          ;pause and wait for trigger
 
@@ -917,7 +917,7 @@ loop
          lda (ptr),y
          beq end
          cmp #c{CBM-@}cmd
-         beq cmd
+         beq cmd ;*+10
          #sl{CBM-@}inc{CBM-@}y
          jmp loop
 cmd      ;get command code
@@ -949,12 +949,12 @@ err
 pr{CBM-@}start
          .block
          lda pr{CBM-@}state
-         beq ended
+         beq *+4 ;ended
 
          clc
          rts
 
-ended    ;state is ended so we can start
+;ended   ;state is ended so we can start
          ; set currrent date in pd fld
 
          ;ldy d{CBM-@}year

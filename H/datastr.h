@@ -25,6 +25,9 @@ openfrpg .byte 0
 
 chrsbkpg .byte 0
 
+jydriver .byte 0
+jyold    .byte 0
+
 ;---------------------------------------
 ; Presentation state
 ;---------------------------------------

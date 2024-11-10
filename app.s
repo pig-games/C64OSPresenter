@@ -1,4 +1,4 @@
-;----[app.s - presenter ]--------------
+;----[ app.s - presenter ]--------------
 
 open{CBM-@}ut  .null "Open"
 fileext  .text ".prs"
@@ -12,7 +12,7 @@ loop
          adc #1
          iny
          dex
-         bne loop
+         bne *-8 ;loop
          rts
          .bend
 
@@ -163,19 +163,20 @@ mnuenq   ;X -> Menu Action Code
          .block
          txa
          ldx #0
-         #switch 5
-         .text "ospne"
+         #switch 6
+         .text "ospnej"
          .rta chkend
          .rta chkend
          .rta chkstrt
          .rta chkstrt
          .rta chkstrt
+         .rta chkjoy
          lda #0
          rts
 
 chkend
          lda pr{CBM-@}state
-         beq ended
+         beq ended ;*+4
          ldx #mnu{CBM-@}dis
 ended
          txa
@@ -187,18 +188,28 @@ chkstrt
 started
          txa
          rts
+
+chkjoy
+         lda jydriver
+         bne *+4 ;active
+         ldx #mnu{CBM-@}sel
+;active
+         ldx #0
+         rts
+
          .bend
 
 mnucmd   ;X -> Menu Action Code
          txa
-         #switch 6
-         .text "!ospne"
+         #switch 7
+         .text "!ospnej"
          .rta quitapp
          .rta fileopen
          .rta pr{CBM-@}start
          .rta pr{CBM-@}prevsl
          .rta pr{CBM-@}nextsl
          .rta pr{CBM-@}end
+         .rta tggljoy
          sec
          rts
          .bend
@@ -316,6 +327,164 @@ done
 
          rts
          .bend
+
+tggljoy
+         .block
+         lda jydriver
+         beq on
+         ;turn off driver and timer
+         lda #"2"
+         jsr joystop
+         jsr unloaddrv
+         jmp end
+
+on       ;turn on driver and timer
+         lda #"2"
+         jsr loaddrv
+         jsr joystart
+end
+         rts
+         .bend
+
+unloaddrv ;unload joystick driver
+         .block
+         ldy jdrvpg
+         bne *+4
+         sec
+         rts
+
+         ldx #0   ;Disable driver
+         stx jdrvpg
+         stx jydriver
+
+         ;Y -> jdrvpg
+         ldx #1
+         jsr pgfree
+
+         clc
+         rts
+         .bend
+
+loaddrv  ;Load Joystick driver
+         ;A -> driver player number
+         .block
+         sta nesxdrv+8
+         pha
+
+         jsr unloaddrv
+
+         pla
+         sec
+         sbc #$30
+         sta jydriver
+
+         ldy #0
+         jsr getsfref
+         stx ptr2+1
+         ldx #0
+         stx ptr2
+
+         lda drvpath,x
+         sta (ptr2),y
+         beq *+6
+         inx
+         iny
+         bne *-9
+
+         ldx #0
+         ldy #frefname
+
+         lda nesxdrv,x
+         sta (ptr2),y
+         beq *+6
+         inx
+         iny
+         bne *-9
+
+         #rdxy ptr2
+         jsr loadreloc
+
+         sta jdrvpg
+         clc
+         rts
+
+drvpath  .null "drivers/"
+nesxdrv  .null "joy.nes x player"
+         .bend
+
+joychk
+         .block
+         pha
+         lda jport2
+         bne *+7
+         sta jyold
+         pla
+         rts
+         cmp jyold
+         bne *+4
+         pla
+         rts
+         sta jyold
+
+         lsr a
+         bcc noup
+         jsr pr{CBM-@}prevsl
+         pla
+         rts
+noup     lsr a
+         bcc nodown
+         jsr pr{CBM-@}nextsl
+         pla
+         rts
+nodown   lsr a
+         bcc noleft
+         jsr pr{CBM-@}prevsl
+         pla
+         rts
+noleft   lsr a
+         bcc noright
+         jsr pr{CBM-@}nextsl
+         pla
+         rts
+noright  lsr a
+         bcc nofire1
+         jsr pr{CBM-@}nextsl
+         pla
+         rts
+nofire1  lsr a
+         bcc nofire2
+         jsr pr{CBM-@}nextsl
+         pla
+         rts
+nofire2  lsr a
+         bcc noselect
+         jsr pr{CBM-@}end
+         pla
+         rts
+noselect lsr a
+         bcc nostart
+         jsr pr{CBM-@}start
+nostart
+         pla
+         rts
+         .bend
+
+joytimer .byte 6,0,0
+         .byte 0
+         .word joychk
+         .byte 6,0,0
+
+joystop  ;Cancel the timer
+         lda #tcancel
+         sta joytimer+tstat
+         rts
+
+joystart ;Start the timer
+         lda #tintrvl.tcancel
+         sta joytimer+tstat
+         #ldxy joytimer
+         jsr timeque
+         rts
 
 ;path.lib
 
