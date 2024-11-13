@@ -166,26 +166,38 @@ mnuenq   ;X -> Menu Action Code
          #switch 6
          .text "ospnej"
          .rta chkend
-         .rta chkend
          .rta chkstrt
-         .rta chkstrt
-         .rta chkstrt
+         .rta chkact
+         .rta chkact
+         .rta chkact
          .rta chkjoy
          lda #0
          rts
 
 chkend
          lda pr{CBM-@}state
-         beq ended ;*+4
+         beq *+4; ended
          ldx #mnu{CBM-@}dis
-ended
+;ended
          txa
          rts
+
 chkstrt
          lda pr{CBM-@}state
-         bne started
+         bne disable
+         lda opnfileref+1
+         bne enable
+disable
          ldx #mnu{CBM-@}dis
-started
+enable
+         txa
+         rts
+
+chkact
+         lda pr{CBM-@}state
+         bne *+4 ;started
+         ldx #mnu{CBM-@}dis
+;started
          txa
          rts
 
