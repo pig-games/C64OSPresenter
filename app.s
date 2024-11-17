@@ -12,7 +12,7 @@ loop
          adc #1
          iny
          dex
-         bne *-8 ;loop
+         bne loop
          rts
          .bend
 
@@ -51,6 +51,12 @@ setchrs  ;y = sourcepg
 
 willfrz
          .block
+         lda jdrvpg
+         beq nojoy
+         sta jdrvpgbk
+         lda #0
+         sta jdrvpg
+nojoy
          ;restore theme colors
 
          ldx bk{CBM-@}bgcol
@@ -64,7 +70,7 @@ willfrz
          rts
          .bend
 
-willthw
+didthw
          .block
          ;Open file if applicable
          lda opnappmcmd
@@ -99,6 +105,11 @@ restore
          sty vic{CBM-@}bcol
          jsr seeram
 
+         lda jdrvpgbk
+         beq done
+         sta jdrvpg
+         lda #0
+         sta jdrvpgbk
 done
          rts
          .bend
@@ -119,11 +130,6 @@ willquit
          jsr pgfree
          ldx #8
          ldy chrsbkpg
-         jsr pgfree
-
-         ;free slide location buffers
-         ldx #1
-         ldy sl{CBM-@}ptrpg
          jsr pgfree
 
          ;free presentation mem
@@ -390,7 +396,10 @@ loaddrv  ;Load Joystick driver
          sbc #$30
          sta jydriver
 
-         ldy #0
+         ldx #1
+         lda #mapsys
+         jsr pgalloc
+
          jsr getsfref
          stx ptr2+1
          ldx #0

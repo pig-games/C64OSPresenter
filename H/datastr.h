@@ -5,7 +5,7 @@
          .word msgcmd   ;Message Handler
          .word willquit ;App Clean Up
          .word willfrz  ;REU Freeze
-         .word willthw  ;REU Thaw
+         .word didthw  ;REU Thaw
 
 layer    .word drawmain
          .word sec{CBM-@}rts
@@ -26,6 +26,7 @@ openfrpg .byte 0
 chrsbkpg .byte 0
 
 jydriver .byte 0
+jdrvpgbk .byte 0
 jyold    .byte 0
 
 ;---------------------------------------

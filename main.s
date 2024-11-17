@@ -46,8 +46,8 @@ ctx2scr  #syscall $f6,$18
          ;#inc{CBM-@}h "file"
 fopen    #syscall $f0,$06
 fread    #syscall $f0,$09
-fclose   #syscall $f0,$15
-frefcvt  #syscall $f0,$18
+fclose   #syscall $f0,$0f
+frefcvt  #syscall $f0,$12
 
          ;#inc{CBM-@}h "memory"
 pgalloc  #syscall $fe,$15
