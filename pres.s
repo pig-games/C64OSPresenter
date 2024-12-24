@@ -983,6 +983,13 @@ pr{CBM-@}start
          ;lda #"e"
          ;sta (ptr),y
 
+         ;start joystick
+         lda jydriver
+         bne joyon
+         lda #"2"
+         jsr loaddrv
+         jsr joystart
+joyon
          ;do actual start slide
 
          lda redrawflgs
@@ -1040,9 +1047,9 @@ pr{CBM-@}nextsl
          lda pr{CBM-@}state
          beq end
 
-         lda sl{CBM-@}cur
-         cmp sl{CBM-@}max
-         bcs end
+         ;lda sl{CBM-@}cur
+        ;cmp sl{CBM-@}max;TODO fix p after max
+         ;bcs end
 
          lda #s{CBM-@}render
          sta pr{CBM-@}state
@@ -1118,6 +1125,13 @@ pr{CBM-@}end
          sty vic{CBM-@}bcol
          jsr seeram
 
+         ;stop joystick
+         lda jydriver
+         beq joyoff
+         lda #"2"
+         jsr joystop
+         jsr unloaddrv
+joyoff
          ;Clear the Draw Context
          lda #" "
          jsr ctxclear

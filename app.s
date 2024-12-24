@@ -116,6 +116,13 @@ done
 
 willquit
          .block
+         ;unload joystck if needed
+         lda jydriver
+         beq joyoff
+         lda #"2"
+         jsr joystop
+         jsr unloaddrv
+joyoff
          ;Restore theme & charset
          jsr willfrz
 
