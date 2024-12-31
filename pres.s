@@ -82,6 +82,7 @@ pr{CBM-@}init  ;Initialise presentation
          stx sl{CBM-@}row
          stx sl{CBM-@}curcol
          stx sl{CBM-@}col
+         stx sl{CBM-@}max
          stx pr{CBM-@}state
          stx slidecmd
          stx ystore
@@ -96,7 +97,6 @@ pr{CBM-@}init  ;Initialise presentation
          stx fldstack+7
          lda #$ff ;no slides yet
          sta sl{CBM-@}cur
-         sta sl{CBM-@}max
          lda #1
          sta sl{CBM-@}haspause
 
@@ -813,7 +813,7 @@ nocr
 printchr
          cmp #$a0
          bne *+4
-         lda #$20
+         lda #$20 ;repl. $a0 with space
          jsr ctxdraw
          inc sl{CBM-@}curcol
 
@@ -848,7 +848,7 @@ noslide
          cmp #c{CBM-@}end
          bne noend
 
-         ;we found !e, prs or field?
+         ;we found !e; prs or field?
 
          ldy sl{CBM-@}infld
          beq notinfld
@@ -892,8 +892,8 @@ nopause
          bcs end
          jmp loop
 
-notinfld
-         lda sl{CBM-@}cur
+notinfld ; prs end
+         lda #1
          sta sl{CBM-@}max
          clc
          tya
@@ -1046,10 +1046,8 @@ pr{CBM-@}nextsl
          .block
          lda pr{CBM-@}state
          beq end
-
-         ;lda sl{CBM-@}cur
-        ;cmp sl{CBM-@}max;TODO fix p after max
-         ;bcs end
+         lda sl{CBM-@}max
+         bne end
 
          lda #s{CBM-@}render
          sta pr{CBM-@}state
@@ -1067,6 +1065,7 @@ pr{CBM-@}prevsl
          beq end
 
          ldx #0
+         stx sl{CBM-@}max
          ldy sl{CBM-@}ptrpg
          #stxy ptr
 
