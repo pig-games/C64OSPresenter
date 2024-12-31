@@ -228,11 +228,11 @@ rsize    .word $00
 
          ;set pd field
 
-         ;ldx #<f{CBM-@}pd
-         ;ldy #>f{CBM-@}pd
-         ;#stxy ptr
-         ;ldy #0
-         ;jsr pr{CBM-@}dodfield
+         ldx #<f{CBM-@}pd
+         ldy #>f{CBM-@}pd
+         #stxy ptr
+         ldy #0
+         jsr pr{CBM-@}dodfield
 
          ldx #0
          stx pr{CBM-@}prslo
@@ -957,31 +957,31 @@ pr{CBM-@}start
 ;ended   ;state is ended so we can start
          ; set currrent date in pd fld
 
-         ;ldy d{CBM-@}year
-         ;ldx d{CBM-@}month
-         ;lda d{CBM-@}day
-         ;jsr toisodt{CBM-@}
+         ldy d{CBM-@}year
+         ldx d{CBM-@}month
+         lda d{CBM-@}day
+         jsr toisodt
 
-         ;#stxy ptr2
+         #stxy ptr2
 
-         ;ldx #<f{CBM-@}pd
-         ;ldy #>f{CBM-@}pd
-         ;#stxy ptr
-         ;inc ptr
-         ;inc ptr
-         ;ldy #0
-;loop
-         ;lda (ptr2),y
-         ;beq dcend
-         ;sta (ptr),y
-         ;iny
-         ;jmp loop
-;dcend
-         ;lda #"!"
-         ;sta (ptr),y
-         ;iny
-         ;lda #"e"
-         ;sta (ptr),y
+         ldx #<f{CBM-@}pd
+         ldy #>f{CBM-@}pd
+         #stxy ptr
+         inc ptr
+         inc ptr
+         ldy #0
+loop
+         lda (ptr2),y
+         beq dcend
+         sta (ptr),y
+         iny
+         jmp loop
+dcend
+         lda #"!"
+         sta (ptr),y
+         iny
+         lda #"e"
+         sta (ptr),y
 
          ;start joystick
          lda jydriver

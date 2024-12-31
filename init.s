@@ -41,6 +41,13 @@ init
          sta pathadd+2
          sta gopath+2
 
+         ldx #"d"
+         ldy #"a"
+         lda #2
+         jsr loadlib
+
+         sta toisodt+2
+
          ;Load Custom TK Classes
 
          ;Load Custom Icons

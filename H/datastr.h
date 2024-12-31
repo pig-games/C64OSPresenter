@@ -74,3 +74,7 @@ fldstack .word 0,0,0,0,0,0,0,0
 ystore   .byte 0
 dirty    .byte 1
 
+d{CBM-@}year   = $03b3
+d{CBM-@}month  = $03b4
+d{CBM-@}day    = $03b5
+

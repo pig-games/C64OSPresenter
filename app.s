@@ -150,6 +150,11 @@ joyoff
          lda #0
          jsr unldlib
 
+         ldx #"d"
+         ldy #"a"
+         lda #0
+         jsr unldlib
+
          ;Unload Custom Icons
 
          rts
@@ -519,4 +524,8 @@ joystart ;Start the timer
 setname  jmp 3
 pathadd  jmp 6
 gopath   jmp 18
+
+;datetime.lib
+
+toisodt  jmp 3
 

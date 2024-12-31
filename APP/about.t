@@ -1,4 +1,4 @@
 Presenter
-0.9.2
+.9.4
 2024
-Erik van der Tier
+Erik v.d. Tier
