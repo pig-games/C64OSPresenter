@@ -1,0 +1,10 @@
+{$f6}{$f1}Slide sections
+
+Presenter supports multiple 'sections' per slide.
+
+Sections can be used to 'build' a slide in multiple steps. This is useful, for example, to show individual bullets, pausing after each bullet.
+
+When stepping forward through the presentation each section of a slide is shown, pausing after each section.
+
+When stepping backwards through the presentation, the presentation always moves to the start of a slide. So when multiple sections of a slide have been shown already, moving backwards moves to the start of the slide. When the presentations is already at
+the start of any slide (with or without sections) the previous slide is shown.

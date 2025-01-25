@@ -1,0 +1,31 @@
+{$f6}{$f1}Presenting
+
+After loading a presentation file the presentation can be started by selecting 'Start' in the 'Slides' menu or by pressing the 'Commodore' key together with 'S'.
+This will start the presentation at the first slide. The presentation can be stopped by selecting 'Stop' in the 'Slide' menu or by pressing the 'Commodore' key together with 'E'.
+When the presentation has started the joystick driver is loaded and the activated. In case the joystick gets disabled you can reanable it using 'Commodore' + 'J'.
+
+{$f1}Going to the next slide
+
+In a running presentation the next slide or section can be presented using either the keyboard or a joystick if it has been connected to port 2.
+
+Using the keyboard press the 'Commodore' key together with 'N'
+Using the joystick either:
+* press the fire
+  button
+* move the joystick
+  to the right
+* move the joystick
+  down
+
+{$f1}Going to the previous slide
+
+The previous slide can also be opened by keyboard or by joystick.
+
+Using the keyboard press the 'Commodore' key together with 'P'.
+Using the joystick either:
+* move the joystick
+  to the left
+* move the joystick
+  up
+
+

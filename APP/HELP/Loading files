@@ -1,0 +1,13 @@
+{$f6}{$f1}Loading files
+
+Presentation files can be loaded in a number of ways.
+
+{$f1}From the file manager
+
+If the .prs file extension has been associated to the Presenter application, presentation files can be loaded by double clicking one in the File Manager. This will open Presenter and load the presentation file.
+
+{$f1}From Presenter
+
+The file open dialog can be opened in Presenter throught the File menu by selecting the open menu item. This can also be done by pressing the Commodore key together with the O key.
+Using the open file dialog .prs files can be selected and opened.
+

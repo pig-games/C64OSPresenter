@@ -1,0 +1,33 @@
+{$f6}{$f1}Introduction
+
+Presenter is a feature-rich presentation application for our favorite 8bit micro. It has been specifically written to run under c64os (our favorite 8bit OS).
+
+Presenter uses presentation files with the extension '.prs'.
+These files are regular SEC files that uses lower/upper case PETSCII with command codes that define the behavior of the presentation.
+It also supports template files that contain reusable content that can be included in presentations.
+The command set for .prs files is documented in a 'built in' tutorial presentation.
+
+Presenter has the following feature set:
+* Support for as many
+  slides as fit in memory
+* Per slide background
+  colors
+* Use of all 16 colors
+  for PETSCII text and
+  'graphics'
+* Multiple paused
+  sections per slide
+* Per line indent 
+  settings
+* Start content on any
+  x,y location
+* 'Windows' with a user
+  defined x,y top left
+  coordinate
+* Keyboard and joystick
+  commands for next/
+  previous slide
+* User definable fields
+  and template support
+
+
