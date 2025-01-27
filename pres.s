@@ -28,11 +28,6 @@ s{CBM-@}ended  = 0
 s{CBM-@}paused = 1
 s{CBM-@}render = 2
 
-f{CBM-@}pv     .text "pv0.8.1!e"
-f{CBM-@}pd     .text "pdyyyy-mm-dd!e"
-f{CBM-@}pf     .text "pf{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
-f{CBM-@}sn     .text "sn0!e  "
-
 pr{CBM-@}free  ;Free open pres mem
          .block
 
@@ -986,8 +981,7 @@ dcend
          ;start joystick
          lda jydriver
          bne joyon
-         lda #"2"
-         jsr loaddrv
+         jsr ldjydrv
          jsr joystart
 joyon
          ;do actual start slide
@@ -1129,7 +1123,7 @@ pr{CBM-@}end
          beq joyoff
          lda #"2"
          jsr joystop
-         jsr unloaddrv
+         jsr unldjydrv
 joyoff
          ;Clear the Draw Context
          lda #" "

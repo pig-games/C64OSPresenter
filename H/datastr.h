@@ -5,7 +5,7 @@
          .word msgcmd   ;Message Handler
          .word willquit ;App Clean Up
          .word willfrz  ;REU Freeze
-         .word didthw  ;REU Thaw
+         .word didthw   ;REU Thaw
 
 layer    .word drawmain
          .word sec{CBM-@}rts
@@ -73,6 +73,11 @@ fldstack .word 0,0,0,0,0,0,0,0
 
 ystore   .byte 0
 dirty    .byte 1
+
+f{CBM-@}pv     .text "pv0.9.4!e"
+f{CBM-@}pd     .text "pdyyyy-mm-dd!e"
+f{CBM-@}pf     .text "pf{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
+f{CBM-@}sn     .text "sn0!e  "
 
 d{CBM-@}year   = $03b3
 d{CBM-@}month  = $03b4

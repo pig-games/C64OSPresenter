@@ -121,7 +121,7 @@ willquit
          beq joyoff
          lda #"2"
          jsr joystop
-         jsr unloaddrv
+         jsr unldjydrv
 joyoff
          ;Restore theme & charset
          jsr willfrz
@@ -363,20 +363,18 @@ tggljoy
          lda jydriver
          beq on
          ;turn off driver and timer
-         lda #"2"
          jsr joystop
-         jsr unloaddrv
+         jsr unldjydrv
          jmp end
 
 on       ;turn on driver and timer
-         lda #"2"
-         jsr loaddrv
+         jsr ldjydrv
          jsr joystart
 end
          rts
          .bend
 
-unloaddrv ;unload joystick driver
+unldjydrv ;unload joystick driver
          .block
          ldy jdrvpg
          bne *+4
@@ -395,17 +393,11 @@ unloaddrv ;unload joystick driver
          rts
          .bend
 
-loaddrv  ;Load Joystick driver
-         ;A -> driver player number
+ldjydrv  ;Load Joystick driver
          .block
-         sta nesxdrv+8
-         pha
+         jsr unldjydrv
 
-         jsr unloaddrv
-
-         pla
-         sec
-         sbc #$30
+         lda #1
          sta jydriver
 
          ldx #1
@@ -442,7 +434,7 @@ loaddrv  ;Load Joystick driver
          rts
 
 drvpath  .null "drivers/"
-nesxdrv  .null "joy.nes x player"
+nesxdrv  .null "joy.nes 2 player"
          .bend
 
 joychk
