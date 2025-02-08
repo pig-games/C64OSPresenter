@@ -87,9 +87,11 @@ notopnf
          lda pr{CBM-@}state
          beq ended
 
+         lda util{CBM-@}opn
+         bne util
          ldy #$d8
          jsr setchrs
-
+util
          ldx sl{CBM-@}bgcol
          ldy sl{CBM-@}bcol
          jmp restore
@@ -167,18 +169,19 @@ msgcmd   ;A -> Msg Command
          ;message types must be handled
          ;to support menu actions
 
-         #switch 3
+         #switch 4
          .byte mc{CBM-@}fopn
          .byte mc{CBM-@}menq,mc{CBM-@}mnu
+         .byte mc{CBM-@}hmem
          .rta pr{CBM-@}load
          .rta mnuenq,mnucmd
+         .rta chk{CBM-@}util
 
 done     sec
          rts
 
 mnuenq   ;X -> Menu Action Code
          lda #0 ;Enabled, Not selected
-         .block
          txa
          ldx #0
          #switch 6
@@ -227,7 +230,6 @@ chkjoy
          ldx #0
          rts
 
-         .bend
 
 mnucmd   ;X -> Menu Action Code
          txa
@@ -313,6 +315,41 @@ invalidt sec         ;invalid type
          rts
 
 validtyp clc
+         rts
+         .bend
+
+chk{CBM-@}util
+         .block
+         lda himemuse
+         and #hmemutil
+         beq no{CBM-@}util
+         lda util{CBM-@}opn
+         bne end
+
+         lda #1
+         sta util{CBM-@}opn
+
+         lda pr{CBM-@}state
+         beq end
+
+         ;restore os chrset
+
+         ldy chrsbkpg
+         jsr restchrs
+
+         jmp end
+no{CBM-@}util
+         lda util{CBM-@}opn
+         beq end
+         ;restore prs chrset
+
+         ldy #$d8
+         jsr setchrs
+
+         lda #0
+         sta util{CBM-@}opn
+end
+         clc
          rts
          .bend
 

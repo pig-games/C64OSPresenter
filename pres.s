@@ -1016,20 +1016,22 @@ doslide
          ldy sl{CBM-@}ptrpg
          #stxy ptr
 
-         ldy #$80 ;hi pages
+         ldy #$80      ;hi pages
 
          sta (ptr),y
          lda sl{CBM-@}seglo
-         ldy #0   ;lo pages
+         ldy #0        ;lo pages
          sta (ptr),y
 
+         lda util{CBM-@}opn
+         bne util
          ldy #$d8
          jsr setchrs
-
+util
          #pr{CBM-@}st{CBM-@}dirty
          #ui{CBM-@}mkredraw
 
-         clc ;Msg Handled
+         clc           ;Msg Handled
          rts
 end
          jmp pr{CBM-@}end

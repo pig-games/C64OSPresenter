@@ -28,6 +28,8 @@ chrsbkpg .byte 0
 jydriver .byte 0
 jdrvpgbk .byte 0
 jyold    .byte 0
+util{CBM-@}opn .byte 0
+
 
 ;---------------------------------------
 ; Presentation state
