@@ -339,20 +339,20 @@ chk{CBM-@}util
          ldy chrsbkpg
          jsr restchrs
 
-         #pr{CBM-@}st{CBM-@}dirty
-         #ui{CBM-@}mkredraw
-
          jmp end
 no{CBM-@}util
          lda util{CBM-@}opn
          beq end
-         ;restore prs chrset
-
-         ldy #$d8
-         jsr setchrs
 
          lda #0
          sta util{CBM-@}opn
+         lda pr{CBM-@}state
+         beq end
+
+         ;restore prs chrset
+         ldy #$d8
+         jsr setchrs
+
 end
          clc
          rts
