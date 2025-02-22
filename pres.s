@@ -34,18 +34,21 @@ pr{CBM-@}free  ;Free open pres mem
          ldy opnfileref+1
          beq done
 
-         ;Free file ref
+         cpy appfileref+1
+         beq afterfree
 
+         ;Free file ref
          ldx #1
          jsr pgfree
+afterfree
 
          ;Free file buf
-
          ldy pr{CBM-@}bufpg
          ldx pr{CBM-@}bufsz
          jsr pgfree
 
          ;Free sl ptrs
+
          ldx #1
          ldy pr{CBM-@}fdpg
          jsr pgfree
@@ -117,6 +120,9 @@ pr{CBM-@}load  ;Load presentation
          ;free existing pres mem
          #phyf
          jsr pr{CBM-@}free
+         ;TODO:why is this needed!
+         ldy chrsbkpg
+         jsr setchrs
          #plyf
 
          ldx #0

@@ -184,14 +184,15 @@ mnuenq   ;X -> Menu Action Code
          lda #0 ;Enabled, Not selected
          txa
          ldx #0
-         #switch 6
-         .text "ospnej"
+         #switch 7
+         .text "ospnejt"
          .rta chkend
          .rta chkstrt
          .rta chkact
          .rta chkact
          .rta chkact
          .rta chkjoy
+         .rta chkend
          lda #0
          rts
 
@@ -233,8 +234,8 @@ chkjoy
 
 mnucmd   ;X -> Menu Action Code
          txa
-         #switch 7
-         .text "!ospnej"
+         #switch 8
+         .text "!ospnejt"
          .rta quitapp
          .rta fileopen
          .rta pr{CBM-@}start
@@ -242,6 +243,7 @@ mnucmd   ;X -> Menu Action Code
          .rta pr{CBM-@}nextsl
          .rta pr{CBM-@}end
          .rta tggljoy
+         .rta opn{CBM-@}tut
          sec
          rts
          .bend
@@ -337,6 +339,9 @@ chk{CBM-@}util
          ldy chrsbkpg
          jsr restchrs
 
+         #pr{CBM-@}st{CBM-@}dirty
+         #ui{CBM-@}mkredraw
+
          jmp end
 no{CBM-@}util
          lda util{CBM-@}opn
@@ -351,6 +356,20 @@ no{CBM-@}util
 end
          clc
          rts
+         .bend
+
+opn{CBM-@}tut
+         .block
+         jsr pr{CBM-@}end
+
+         #ldxy tut{CBM-@}fname
+         jsr cnfappfref
+         jsr pr{CBM-@}load
+         jsr pr{CBM-@}start
+
+         clc
+         rts
+tut{CBM-@}fname .null "tutorial.prs"
          .bend
 
 drawmain ;Main draw routine
@@ -547,6 +566,30 @@ joystart ;Start the timer
          #ldxy joytimer
          jsr timeque
          rts
+
+cnfappfref
+         .block
+         ;RegPtr->Filename
+         ;RegPtr<-appfileref
+         ;ptr<-appfileref
+
+         #stxy fstr+1
+
+         #rdxy appfileref
+         #stxy ptr
+
+         ldx #$ff
+         ldy #frefname-1
+
+         inx
+         iny
+fstr     lda $ffff,x        ;self mod
+         sta (ptr),y
+         bne *-7
+
+         #rdxy ptr
+         rts
+         .bend
 
 ;path.lib
 
