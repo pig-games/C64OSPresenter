@@ -120,9 +120,6 @@ pr{CBM-@}load  ;Load presentation
          ;free existing pres mem
          #phyf
          jsr pr{CBM-@}free
-         ;TODO:why is this needed!
-         ldy chrsbkpg
-         jsr setchrs
          #plyf
 
          ldx #0
