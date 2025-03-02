@@ -66,14 +66,56 @@ init
          ;Open file if applicable
          lda opnappmcmd
          cmp #mc{CBM-@}fopn
-         bne done
+         bne nofile
 
          ldy opnappmdhi
          ldx #0
          stx opnappmcmd
          jsr pr{CBM-@}load
-
-done
          rts
+nofile
+         jsr ldsplash
+         rts
+         .bend
+
+ldsplash
+         .block
+
+         ldx #0
+         ldy drawctx+d{CBM-@}origin+1
+         sty addr1+1
+         sty addr2+1
+         ldy drawctx+d{CBM-@}coloro+1
+         sty addr3+1
+
+         #ldxy spl{CBM-@}fname
+         jsr cnfappfref
+
+         ;store fref and open file
+
+         sty opnfileref+1
+         lda #ff{CBM-@}r
+         jsr fopen
+
+         #rdxy opnfileref
+         ;skip header
+
+         jsr fread
+addr1    .word $00
+         .word 55
+
+         ;read screen codes
+         jsr fread
+addr2    .word $00
+         .word 1000
+
+         jsr fread
+addr3    .word $00
+         .word 1000
+
+         jsr fclose
+
+         rts
+spl{CBM-@}fname .null "splash.pet"
          .bend
 

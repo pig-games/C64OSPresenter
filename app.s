@@ -352,7 +352,6 @@ no{CBM-@}util
          ;restore prs chrset
          ldy #$d8
          jsr setchrs
-
 end
          clc
          rts
@@ -390,10 +389,10 @@ drawmain ;Main draw routine
          jsr setdprops
 
          lda pr{CBM-@}bufsz
-         beq nofile
+         beq done
          lda pr{CBM-@}state
          bne render
-nofile
+
          ;Clear the Draw Context
          lda #" "
          jsr ctxclear

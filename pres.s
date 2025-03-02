@@ -44,9 +44,9 @@ afterfree
 
          ;Free file buf
          ldy pr{CBM-@}bufpg
+         beq nobuf
          ldx pr{CBM-@}bufsz
          jsr pgfree
-
          ;Free sl ptrs
 
          ldx #1
@@ -57,7 +57,7 @@ afterfree
          ldx #1
          ldy sl{CBM-@}ptrpg
          jsr pgfree
-
+nobuf
          lda #0
          sta opnfileref+1
          sta pr{CBM-@}bufpg
