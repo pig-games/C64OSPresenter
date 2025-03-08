@@ -76,7 +76,7 @@ fldstack .word 0,0,0,0,0,0,0,0
 ystore   .byte 0
 dirty    .byte 1
 
-f{CBM-@}pv     .text "pv0.9.4!e"
+f{CBM-@}pv     .text "pv1.0b!e"
 f{CBM-@}pd     .text "pdyyyy-mm-dd!e"
 f{CBM-@}pf     .text "pf{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}!e"
 f{CBM-@}sn     .text "sn0!e  "

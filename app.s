@@ -390,20 +390,18 @@ drawmain ;Main draw routine
 
          lda pr{CBM-@}bufsz
          beq done
-         lda pr{CBM-@}state
-         bne render
-
-         ;Clear the Draw Context
-         lda #" "
-         jsr ctxclear
-         jmp done
-
-render   ;dirty and have file
+         ;dirty and have file
          ;presentation output
 
          lda pr{CBM-@}state
+         beq info
          cmp #s{CBM-@}render
+         beq render
          bne done
+info
+         jsr pr{CBM-@}info
+         jmp done
+render
          jsr pr{CBM-@}render
 done
          ldx #0

@@ -769,9 +769,119 @@ pr{CBM-@}dofield
          sta ptr+1
 
          ldy #0
-
 end
          clc
+         rts
+         .bend
+
+pr{CBM-@}dohcmd ;header allowed commands
+         .block
+         #sl{CBM-@}inc{CBM-@}y
+         #switch 6
+         .byte c{CBM-@}loc
+         .byte c{CBM-@}window
+         .byte c{CBM-@}sttab
+         .byte c{CBM-@}clend
+         .byte c{CBM-@}color
+         .byte c{CBM-@}backgr
+         .rta pr{CBM-@}doloc
+         .rta pr{CBM-@}dowindow
+         .rta pr{CBM-@}dotab
+         .rta pr{CBM-@}doclend
+         .rta pr{CBM-@}docolor
+         .rta pr{CBM-@}dobackgr
+
+         sec
+         rts
+         .bend
+
+pr{CBM-@}info
+         .block
+
+         #ldxy 0
+         clc
+         jsr setlrc
+         #ldxy 0
+         sec
+         jsr setlrc
+
+         ;Clear the Draw Context
+         lda #" "
+         jsr ctxclear
+
+         jsr pr{CBM-@}init
+
+         ;skip chars upto first !s or !d
+
+         ldx sl{CBM-@}seglo
+         ldy sl{CBM-@}seghi
+         #stxy ptr
+
+         #ui{CBM-@}newline
+         #ui{CBM-@}newline
+         ldy #0
+loop
+         lda (ptr),y
+         bne *+5
+         jmp end
+         cmp #c{CBM-@}cmd
+         beq cmd
+         cmp #cr
+         bne printchar
+
+         sty ystore
+         #ui{CBM-@}newline
+         ldy ystore
+         #sl{CBM-@}inc{CBM-@}y
+         jmp loop
+printchar
+         cmp #$a0
+         bne *+4
+         lda #$20 ;repl. $a0 with space
+         jsr ctxdraw
+         inc sl{CBM-@}curcol
+
+         #sl{CBM-@}inc{CBM-@}y
+         jmp loop
+cmd      ;get command code
+         #sl{CBM-@}inc{CBM-@}y
+         lda (ptr),y
+         beq end
+
+         cmp #"!"      ;second !
+         beq printchar ;output !
+         cmp #c{CBM-@}slide
+         beq end
+         cmp #c{CBM-@}end
+         beq end
+
+         cmp #c{CBM-@}dfield
+         beq dloop
+         ; process allowed command
+
+         jsr pr{CBM-@}dohcmd
+         bcs err
+         jmp loop
+
+         ;skip dfield
+dloop
+         #sl{CBM-@}inc{CBM-@}y
+         lda (ptr),y
+         beq end
+         cmp #c{CBM-@}cmd
+         bne dloop
+         #sl{CBM-@}inc{CBM-@}y
+         lda (ptr),y
+         beq end
+         cmp #c{CBM-@}end
+         bne dloop
+         #sl{CBM-@}inc{CBM-@}y
+         jmp loop
+end
+         clc
+         rts
+err
+         sec
          rts
          .bend
 
@@ -930,7 +1040,7 @@ cmd      ;get command code
          beq end
 
          cmp #c{CBM-@}dfield
-         bne err
+         bne loop
          ;process dfield
          #sl{CBM-@}inc{CBM-@}y ;eat d
          jsr pr{CBM-@}dodfield
@@ -948,7 +1058,6 @@ pr{CBM-@}start
          .block
          lda pr{CBM-@}state
          beq *+4 ;ended
-
          clc
          rts
 
