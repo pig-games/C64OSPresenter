@@ -39,7 +39,7 @@ The following fields are 'standard' by convention:
 * __cd__: Creation Date, this field is used to contain the creation date of the presentation
 
 One way to allow for one more field is by using either the __TI__ or __ST__ field for both the title of the presentation and the title of a section of slides (if both titles are not used at the same time anywhere).
-### Dynamic fields (will be available in later version)
+### Dynamic fields
 These fields are always available and don't need any definition. Do note that these are really regular fields and are set automatically at specific points during the use of the Presenter. This means that they can be overwritten like any other field, so if you don't want this make sure you don't but it also allows you to reclaim the field names if you don't need the 'automatic' values
 
 The following dynamic (automatic) fields are defined:
