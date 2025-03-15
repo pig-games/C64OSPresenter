@@ -54,7 +54,7 @@ The bulk of a slide's content consists of standard petsii text. In addition to t
 The following commands are supported:
 * __!#\<path\>__: Only allowed at the first character of a presentation file (and only one level deep). The path must be an absolute path that specifies the template file that is to be included in the presentation.
 * __!s__\<CR\>: Start of a new slide/section. This command pauses the presentation, and when 'Next' is triggered, will clear the screen and start any new content from the top-left of the screen. Note that this command needs to end with a CR (carriage return).
-* **!p**\<CR\>: Pause the current slide. This command pauses the presentation and when 'Next' is triggered, will continue any new content at the paused position.
+* **!p**: Pause the current slide. This command pauses the presentation and when 'Next' is triggered, will continue any new content at the paused position.
 * **!c**xx: Changes the text color. It requires a two digit decimal number, between 0 and 15, immediately after the command.
 * **!b**xx: Changes the background color. It requires a two digit decimal number, between 0 and 15, immediately after the command. This command is mostly useful right after a __!s__ or __!p__ command. In the latter scenario it allows for changing background color after each pause, note that the full screen background is changed.
 * **!l**xxyy: Changes the ouput location. This command requires a two digit decimal numbers, the first for the new X coordinate (or column) the second for the new Y coordinate (or row). Note that as the screen has a resolution of 40x25 characters these values have to be between 0-39 and 0-24 respectively.
