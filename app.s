@@ -80,6 +80,7 @@ didthw
          ldy opnappmdhi
          ldx #0
          stx opnappmcmd
+
          jsr pr{CBM-@}load
          jsr pr{CBM-@}end
 
@@ -251,6 +252,8 @@ mnucmd   ;X -> Menu Action Code
 fileopen ;Open file util
          .block
 
+         jsr pr{CBM-@}free
+
          lda #mc{CBM-@}mptr
          sta opnutilmcmd
 
@@ -360,7 +363,6 @@ end
 opn{CBM-@}tut
          .block
          jsr pr{CBM-@}end
-
          #ldxy tut{CBM-@}fname
          jsr cnfappfref
          jsr pr{CBM-@}load

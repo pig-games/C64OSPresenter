@@ -603,7 +603,7 @@ pr{CBM-@}doclend
          .block
          ldx sl{CBM-@}curcol
 loop
-         cpx #39
+         cpx #40
          bcs end ;*+11
          lda #$20
          jsr ctxdraw
@@ -860,7 +860,7 @@ cmd      ;get command code
          ; process allowed command
 
          jsr pr{CBM-@}dohcmd
-         bcs err
+         ;bcs err
          jmp loop
 
          ;skip dfield
@@ -997,7 +997,7 @@ pause
          rts
 nopause
          jsr pr{CBM-@}docmd
-         bcs end
+         ;bcs end
          jmp loop
 
 notinfld ; prs end
